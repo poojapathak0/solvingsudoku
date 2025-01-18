@@ -1,0 +1,11 @@
+{% extends "Sudoku/login.html" %}
+{% block content %}
+    {% if form.errors %}
+    <p>Your username didn't match.Please try again.</p>
+    {% endif %}
+    <form action="{% url 'accounts:log_in' %}" method= 'post'>
+        {%csrf_token%}
+        {{form.as_div}}
+        <button name="submit">Login</button>
+    </form>
+{% endblock content %}
