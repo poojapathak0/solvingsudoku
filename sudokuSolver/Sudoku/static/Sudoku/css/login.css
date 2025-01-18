@@ -1,0 +1,340 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Caveat Brush", serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  background-color: #f5f5f5;
+}
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100vh;
+  background-color: black;
+  transition: left 0.3s ease-in-out;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.sidebar.active {
+  left: 0;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+nav {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem 0;
+}
+
+/* Hamburger Button - Fixed position and hover */
+.ham {
+  position: fixed;
+  left: 40px;
+  top: 20px;
+  z-index: 1001;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ham img {
+  width: 25px;
+  height: 20px;
+}
+
+.ham:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  /* transform: scale(1.1); */
+}
+
+/* Navigation Elements */
+.top, .buttom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.menu {
+  width: 170px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.menu img {
+  height: clamp(30px, 3vw, 40px);
+  width: clamp(39px, 3vw, 40px);
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.hamburger:hover{
+  border-radius: 5px;
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.homeicon:hover{
+  border-radius: 5px;
+  transform: scale(1.1);
+  cursor: pointer;
+}
+.Play, .Solver, .help {
+  color: #f0f0f0;
+  width: 90%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.Play img, .Solver img {
+  height: clamp(35px, 4vw, 50px);
+  width: clamp(35px, 4vw, 50px);
+}
+
+.help img {
+  height: clamp(25px, 3vw, 35px);
+  width: clamp(25px, 3vw, 35px);
+}
+
+.Play:hover, .Solver:hover, .help:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-left: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+.login-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 0px 80px 0px 80px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height:100%;
+  max-height: 500px;
+  max-width: 580px;
+  left: -6%;
+  top: -5%;
+  position: relative;
+}
+
+.profile {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid black;
+}
+
+.profile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.login-text {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;;
+  
+}
+.form-group {  
+  position: relative;  
+  margin-bottom: 1rem;  
+}  
+
+.login-input {  
+  width: 100%;  
+  padding: 1rem;  
+  padding-left: 10px;  
+  font-size: 1.5rem;  
+  border: 2px solid #ddd;  
+  border-radius: 8px;  
+  transition: border-color 0.2s ease;  
+}  
+
+.form-group label {  
+  position: absolute;  
+  font-size: 1.5rem;
+  color: rgb(118, 119, 119);  
+  left: 10px;  
+  top: 50%;  
+  transform: translateY(-50%);  
+  transition: all 0.2s ease;  
+  pointer-events: none;  
+  background: transparent;  
+  padding: 0 5px;  
+}  
+
+.login-input:focus,  
+.login-input:not(:placeholder-shown) {  
+  outline: none;  
+  border-color: var(--accent, #403f3f);  
+}  
+
+.login-input:focus + label,  
+.login-input:not(:placeholder-shown) + label {  
+  top: 0;  
+  transform: translateY(-50%) scale(0.8);  
+  background: white;  
+  color: var(--accent, #000000);  
+}  
+
+/* Ensure placeholder is hidden */  
+.login-input::placeholder {  
+  color: transparent;  
+}  
+
+.Submit{
+  margin-left: 85%;
+  width: 15%;
+  height:10%;
+  font-size: 1.5rem;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 5 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  background-color: #F9AC30;;
+}
+
+.Submit:hover{
+  transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+      margin-left: 0;
+      padding: 1rem;
+  }
+
+
+  .menu-toggle {
+      display: block;
+  }
+
+  .nav-visible {
+      transform: translateX(0);
+  }
+
+  }
+  
+
+
+@media (max-width: 768px) {
+  nav {
+      min-width: 60px;
+  }
+  
+  .Play p, .Solver p, .help p {
+      display: none;
+  }
+  
+  .Play, .Solver, .help {
+      justify-content: center;
+  }
+  
+  .screen {
+      margin-left: 60px;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-container {
+      padding: 1.5rem;
+  }
+
+  .profile {
+      width: 100px;
+      height: 100px;
+  }
+
+  .login-text {
+      font-size: 1.2rem;
+  }
+
+  .login-input {
+      font-size: 1rem;
+      padding: 0.6rem;
+  }
+}
+@media(max-width: 430px){
+  .Submit{
+    width: 40px;
+    height: 20px;
+    font-size: 0.5em;
+   
+  }
+  .login-container{
+    width: 280px;
+    height: 300px;
+    top: -170px;
+    
+  }
+  .profile{
+    width:80px;
+    height:80px;
+  }
+  .login-text{
+    font-size: 1em;
+  }
+  .login-input{
+    font-size: 0.8em;
+    padding: 0.4em;
+  }
+  
+  
+}
+
+@media (max-width: 320px) {
+  .login-container {
+      padding: 1rem;
+      width: 240px;
+      height:280px;
+  }
+
+  .profile {
+      width: 70px;
+      height: 70px;
+     
+  }
+  .Submit{
+    width: 48px;
+    height: 28px;
+    margin-left: 155px;
+    font-size: 0.6em;
+  }
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Sudoku/css/solver.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Karla:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <nav>
+        <div class="top">
+
+            <div class="menu">
+                <div class="hamburger">
+                    <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
+                </div>
+                <div class="homeicon">
+                    <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
+                </div>
+            </div>
+            <div class="Play">
+                <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
+                <p>Play</p>
+            </div>
+            <div class="Solver">
+                <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">
+                <p>Solver</p>
+            </div>
+            </div>
+
+            <div class="buttom">
+                <div class="help">
+                    <img src="{% static 'Sudoku/images/questionmark.svg' %}" alt="">
+                    <p>Help</p>
+                </div>
+            </div>
+    </nav>
+
+    <div class="sudoku-grid">
+        <!-- 81 grid cells for Sudoku -->
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    <script src=""></script>
+    
+    <div>
+        <input type="text" placeholder="Enter input" class="user" ></div>
+
+        <div id="rectangle1"></div>
+
+   </div>
+   <div class="dialouge">
+   <div class="rectangle">
+    <div class="rectangle2">
+        
+    </div>
+    
+    <div class="rectangle3"></div>
+    <div class="rectangle4"></div>
+    <div class="boxes">
+        <div class="cell">1</div>
+        <div class="cell">2</div>
+        <div class="cell">3</div>
+        <div class="cell">4</div>
+        <div class="cell">5</div>
+        <div class="cell">6</div>
+        <div class="cell">7</div>
+        <div class="cell">8</div>
+        <div class="cell">9</div>
+    </div>
+   
+    </div>
+    
+    <div class="smallrectangle">
+        <p id="solve">Solve</p>
+      </div>
+
+
+</body>
+
+</html>

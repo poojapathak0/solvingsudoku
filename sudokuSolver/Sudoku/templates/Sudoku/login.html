@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Sudoku/css/login.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Karla:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="ham">
+        <button id = "ham" class="ham"><img id="ham" src="{% static 'Sudoku/images/ham1.png' %}" alt="" srcset=""></button>
+    </div>
+    <div class ="sidebar" id = "sidebar">
+    <nav>
+        <div class="top">
+
+            <div class="menu">
+                <div class="hamburger">
+                    <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
+                </div>
+                <div class="homeicon">
+                    <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
+                </div>
+            </div>
+              <div class="Play" id="playbutton">
+                <a href="login.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                    <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
+                    <p>Play</p>
+                </a>
+            </div>
+            
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const submitButton = document.getElementById('Submit');
+                    const usernameInput = document.querySelector('.login-input');
+                    
+                    submitButton.addEventListener('click', function(event) {
+                        if (usernameInput.value.trim() === "") {
+                            event.preventDefault(); // Stop the default navigation
+                            alert("Please enter your username before proceeding.");
+                        } else {
+                            window.location.href = 'level.html'; // Navigate only if input is valid
+                        }
+                    });
+                });
+            </script>
+            
+            <div class="Play" id="solverbutton">
+                <a href="solver.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                    <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">
+                    <p>Solver</p>
+                </a>
+                </div>
+           
+            
+            <!-- JavaScript (Optional if not using anchor tag) -->
+            <script>
+                document.getElementById('solverbutton').addEventListener('click', function() {
+                    window.location.href = 'solver.html';
+                });
+            </script>
+            </div>
+            <div class="buttom">
+                <div class="help">
+                    <img src="{% static 'Sudoku/images/questionmark.svg' %}" alt="">
+                    <p>Help</p>
+                </div>
+            </div>
+    </nav>
+</div>
+
+
+  
+<main class="main-content">
+    <div class="login-container">
+        <div class="profile">
+            <img src="{% static 'Sudoku/images/profile.jpg ' %}" alt="Profile">
+        </div>
+        <div class="login-text">Enter the username:</div>
+        <div class = "form-group">
+            <input type="text" class="login-input" placeholder="Username">
+            <label for = "login-input">Username</label>
+        </div>
+        <button id="Submit" class="Submit">Submit</button>
+    </div>
+    
+</main>
+
+    <script>
+        // JavaScript for toggling the sidebar  
+        const hamburger = document.getElementById('ham');  
+        const sidebar = document.getElementById('sidebar');  
+    
+        hamburger.addEventListener('click', () => {  
+            sidebar.classList.toggle('active'); // Toggle the active class  
+        });  
+        
+        document.addEventListener('click', (event) => {  
+                const isClickInside = sidebar.contains(event.target) || hamburger.contains(event.target);  
+                if (!isClickInside) {  
+                    sidebar.classList.remove('active'); // Hide the sidebar  
+                }  
+            });
+    </script>  
+     
+</body>
+
+</html>

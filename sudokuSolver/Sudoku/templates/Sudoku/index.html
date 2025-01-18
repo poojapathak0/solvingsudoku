@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Sudoku/css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Karla:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <nav>
+        <div class="top">
+
+            <div class="menu">
+                <div class="hamburger" id="hamburgerbutton">
+                    <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;"></a>
+                    <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
+                </a>
+                </div>
+                <script>
+                    document.getElementById('hamburgerbutton').addEventListener('click', function() {
+                        window.location.href = 'index.html';
+                    });
+                </script>
+                
+                <div class="homeicon" id="homebutton">
+                    <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;"></a>
+                    <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
+                </a>
+                </div>
+                <script>
+                    document.getElementById('homebutton').addEventListener('click', function() {
+                        window.location.href = 'index.html';
+                    });
+                </script>
+            </div>
+            <div class="Play" id="playbutton">
+                <a href="login.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                    <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
+                    <p>Play</p>
+                </a>
+            </div>
+            
+            <!-- JavaScript (Optional if not using anchor tag) -->
+            <script>
+                document.getElementById('playbutton').addEventListener('click', function() {
+                    window.location.href = 'login.html';
+                });
+            </script>
+           
+           
+            <div class="Play" id="solverbutton">
+                <a href="solver.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                    <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">
+                    <p>Solver</p>
+                </a>
+                </div>
+           
+            
+            <!-- JavaScript (Optional if not using anchor tag) -->
+            <script>
+                document.getElementById('solverbutton').addEventListener('click', function() {
+                    window.location.href = 'solver.html';
+                });
+            </script>
+            </div>
+
+            <div class="buttom">
+                <div class="help">
+                    <img src="{% static 'Sudoku/images/questionmark.svg'%}" alt="">
+                    <p>Help</p>
+                </div>
+            </div>
+    </nav>
+
+    <div class="screen">
+        <div class="cube">
+            <img src="{% static 'Sudoku/images/cube.svg'%}" alt="" srcset="">
+        </div>
+        <div class="screentext">
+            <div class="maintext">
+                <div class="part1">SUDOKU</div>
+                <div class="part2">SOLVER</div>
+            </div>
+            <div class="subtext">PLAY, SOLVE, AND LEARN</div>
+
+        </div>
+        
+        <div class="joystick">
+            <img src="{% static 'Sudoku/images/joy.svg'%}" alt="">
+        </div>
+    </div>
+    <script src=""></script>
+</body>
+
+</html>

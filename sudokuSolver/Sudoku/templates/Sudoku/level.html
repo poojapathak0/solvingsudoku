@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Sudoku/css/level.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Karla:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="ham">
+        <button id = "ham" class="ham"><img id="ham" src="{% static 'Sudoku/images/ham1.png' %}" alt="" srcset=""></button>
+    </div>
+    <div class ="sidebar" id = "sidebar">
+    <nav>
+        <div class="top">
+
+            <div class="menu">
+                <div class="hamburger">
+                    <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
+                </div>
+                <div class="homeicon">
+                    <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
+                </div>
+            </div>
+            <div class="Play">
+                <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
+                <p>Play</p>
+            </div>
+            <div class="Solver">
+                <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">
+                <p>Solver</p>
+            </div>
+            </div>
+
+            <div class="buttom">
+                <div class="help">
+                    <img src="{% static 'Sudoku/images/questionmark.svg' %}" alt="">
+                    <p>Help</p>
+                </div>
+            </div>
+    </nav>
+</div>
+<div class="buttons">
+    <div class="rectangle1">
+        <p id="beginner-text">BEGINNER</p>
+  </div>
+
+  <p class="difficulty">Choose a difficulty</p>
+  
+  
+  <div class="rectangle2">
+    <p id="easy-text">EASY</p>
+</div>
+
+<div class="rectangle3">
+    <p id="medium-text">MEDIUM</p>
+</div>
+
+<div class="rectangle4">
+    <p id="hard-text">HARD</p>
+</div>
+    
+<div class="rectangle5">
+    <p id="extreme-text">EXTREME</p>
+</div>
+</div>
+
+<!-- Add this right after the opening <body> tag -->
+    <div class="user-profile" id="userProfile">
+        <div class="profile-header">
+            <div class="profile-icon">
+                <img src="{% static 'Sudoku/images/profile.jpg' %}" alt="Profile Icon">
+            </div>
+            <p class="username">Username</p>
+        </div>
+        <div class="profile-content">
+            <div class="score-display">
+                <p class="score-label">Highest Score</p>
+                <p class="score-value">850</p>
+            </div>
+            <div class="dropdown-item" onclick="changeUsername()">
+                <img src="{% static 'Sudoku/images/change.png' %}" alt="Edit" width="16" height="16">
+                Change Username
+            </div>
+            <div class="dropdown-item delete-profile" onclick="deleteProfile()">
+                <img src="{% static 'Sudoku/images/delete.png' %}" alt="Delete" width="16" height="16">
+                Delete Profile
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const userProfile = document.getElementById('userProfile');
+    
+        // Toggle dropdown on profile click
+        userProfile.addEventListener('click', (event) => {
+            event.stopPropagation();
+            userProfile.classList.toggle('expanded');
+        });
+    
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userProfile.contains(event.target)) {
+                userProfile.classList.remove('expanded');
+            }
+        });
+    
+        // Change username function
+        function changeUsername() {
+            const newUsername = prompt('Enter new username:');
+            if (newUsername && newUsername.trim() !== '') {
+                document.querySelector('.username').textContent = newUsername.trim();
+            }
+        }
+    
+        // Delete profile function
+        function deleteProfile() {
+            if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+                // Add profile deletion logic here
+                alert('Profile deleted');
+            }
+        }
+    </script>
+
+<script>  
+    // JavaScript for toggling the sidebar  
+    const hamburger = document.getElementById('ham');  
+    const sidebar = document.getElementById('sidebar');  
+
+    hamburger.addEventListener('click', () => {  
+        sidebar.classList.toggle('active'); // Toggle the active class  
+    });  
+    
+    document.addEventListener('click', (event) => {  
+            const isClickInside = sidebar.contains(event.target) || hamburger.contains(event.target);  
+            if (!isClickInside) {  
+                sidebar.classList.remove('active'); // Hide the sidebar  
+            }  
+        });
+</script>  
+</body>
+
+</html>
