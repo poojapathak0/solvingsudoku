@@ -1,5 +1,5 @@
 # Sudoku-Solver
 
-SuperUser:
-Username: ChillGuy
+SuperUser: <br/>
+Username: ChillGuy <br/>
 Password: Sudoku123
