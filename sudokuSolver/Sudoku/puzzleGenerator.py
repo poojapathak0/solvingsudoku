@@ -98,15 +98,9 @@ def has_unique_solution(board):
     return solve_with_count(board_copy) == 1
 
 
-# Print the grid in a readable format
-def print_grid(grid):
-    for row in grid:
-        print(" ".join(str(num) if num != 0 else '.' for num in row))
-
 # Generate and display the puzzle
 if __name__ == "__main__":
     base_grid = generate_base_grid()
     shuffled_grid = shuffle_grid(base_grid)
     sudoku_puzzle = create_puzzle(shuffled_grid, clues=36)  # Adjust clues for difficulty
-    print("Generated Sudoku Puzzle:")
-    print_grid(sudoku_puzzle)
+
