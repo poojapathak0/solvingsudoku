@@ -96,7 +96,40 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const difficulties = {
+                beginner: 50,
+                easy: 40,
+                medium: 30,
+                hard: 20,
+                extreme: 10
+            };
     
+            document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
+                element.addEventListener("click", function () {
+                    const difficulty = element.id.split("-")[0]; // Extract difficulty from id
+                    const clues = difficulties[difficulty]; // Get the clue count
+                    fetch('/sudoku/generate/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ clues })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data); // Use this data to render the puzzle on the page
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
+    
+
     <script>
         const userProfile = document.getElementById('userProfile');
     
