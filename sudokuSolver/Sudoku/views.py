@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .heuristicSolver import solve_with_heuristic
+from .puzzleGenerator import generate_base_grid, shuffle_grid, create_puzzle
 
 # Create your views here.
 
