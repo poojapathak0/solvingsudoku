@@ -20,7 +20,7 @@
 
             <div class="menu">
                 <div class="hamburger" id="hamburgerbutton">
-                    <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;"></a>
+                    <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
                 </a>
                 </div>
@@ -31,7 +31,7 @@
                 </script>
                 
                 <div class="homeicon" id="homebutton">
-                    <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;"></a>
+                    <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem">
                     <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
                 </a>
                 </div>
@@ -42,7 +42,7 @@
                 </script>
             </div>
             <div class="Play" id="playbutton">
-                <a href="login.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <a href="{% url 'login' %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
                     <p>Play</p>
                 </a>
@@ -57,7 +57,7 @@
            
            
             <div class="Play" id="solverbutton">
-                <a href="solver.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <a href="{%url 'solver'%}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">
                     <p>Solver</p>
                 </a>
