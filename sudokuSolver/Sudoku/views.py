@@ -21,6 +21,28 @@ def generate_sudoku(request):
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+
+@csrf_exempt
+def solve_sudoku(request):
+    if request.method == 'POST':
+        try:
+            # Parse user input
+            body = json.loads(request.body)
+            grid = body.get('grid')
+
+            if not grid or len(grid) != 9 or any(len(row) != 9 for row in grid):
+                return JsonResponse({'success': False, 'error': 'Invalid grid format'}, status=400)
+
+            # Solve the puzzle
+            if solve_with_heuristic(grid):
+                return JsonResponse({'success': True, 'solution': grid})
+            else:
+                return JsonResponse({'success': False, 'error': 'No solution found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
 def index_view(request):
     return render(request, 'Sudoku\index.html')
 
