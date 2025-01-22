@@ -15,6 +15,7 @@
 </head>
 
 <body>
+    {% csrf_token %}
     <div class="ham">
         <button id = "ham" class="ham"><img id="ham" src="{% static 'Sudoku/images/ham1.png' %}" alt="" srcset=""></button>
     </div>
@@ -27,47 +28,32 @@
                     <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
                 </div>
                 <div class="homeicon">
+                    <a href="{%url 'home'%}">
                     <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
+                    </a>
                 </div>
             </div>
-              <div class="Play" id="playbutton">
-                <a href="{%url 'login' %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
-                    <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
-                    <p>Play</p>
-                </a>
-            </div>
+            <div class="Play" id="playbutton" onclick="navigateToLogin()">  
+                <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">  
+                <p>Play</p>  
+            </div>  
             
+            <div class="Play" id="solverbutton" onclick="navigateToSolver()">  
+                <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">  
+                <p>Solver</p>  
+            </div>  
             
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const submitButton = document.getElementById('Submit');
-                    const usernameInput = document.querySelector('.login-input');
-                    
-                    submitButton.addEventListener('click', function(event) {
-                        if (usernameInput.value.trim() === "") {
-                            event.preventDefault(); // Stop the default navigation
-                            alert("Please enter your username before proceeding.");
-                        } else {
-                            window.location.href = 'level.html'; // Navigate only if input is valid
-                        }
-                    });
-                });
+            <script>  
+                function navigateToLogin() {  
+                    window.location.href = "{% url 'login' %}";  
+                }  
+            
+                function navigateToSolver() {  
+                    window.location.href = "{% url 'solver' %}";  
+                }  
             </script>
-            
-            <div class="Play" id="solverbutton">
-                <a href="solver.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
-                    <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">
-                    <p>Solver</p>
-                </a>
-                </div>
            
             
-            <!-- JavaScript (Optional if not using anchor tag) -->
-            <script>
-                document.getElementById('solverbutton').addEventListener('click', function() {
-                    window.location.href = 'solver.html';
-                });
-            </script>
             </div>
             <div class="buttom">
                 <div class="help">
@@ -82,15 +68,25 @@
   
 <main class="main-content">
     <div class="login-container">
+        {% if messages %}  
+<ul class="messages">  
+    {% for message in messages %}  
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>  
+    {% endfor %}  
+</ul>  
+{% endif %} 
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
         <div class="profile">
-            <img src="{% static 'Sudoku/images/profile.jpg ' %}" alt="Profile">
+            <img src="{% static 'Sudoku/images/profile.jpg' %}" alt="Profile">
         </div>
         <div class="login-text">Enter the username:</div>
         <div class = "form-group">
-            <input type="text" class="login-input" placeholder="Username">
-            <label for = "login-input">Username</label>
+            <input type="text" class="login-input" placeholder="Username" minlength="3" maxlength="30" name = "username" id = "username">
+            <label for = "username">Username</label>
         </div>
         <button id="Submit" class="Submit">Submit</button>
+        </form>
     </div>
     
 </main>
@@ -110,6 +106,11 @@
                     sidebar.classList.remove('active'); // Hide the sidebar  
                 }  
             });
+
+
+                document.getElementById('solverbutton').addEventListener('click', function() {
+                    window.location.href = '/solver/';
+                });
     </script>  
      
 </body>
