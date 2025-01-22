@@ -5,59 +5,85 @@
     font-family: "Caveat Brush", serif;
 }
 
-body {
-    display: flex;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-/* Navigation Styles */
-nav {
-    min-width: 80px;
-    width: clamp(80px, 16vw, 250px);
+.sidebar {
+    position: fixed;
+    left: -250px;
+    top: 0;
+    width: 250px;
     height: 100vh;
-    background-color: black;
-    color: white;
+    background-color: #1a1a1a;
+    transition: left 0.3s ease-in-out;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  
+  nav {
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 1rem 0;
+  }
+  
+  /* Hamburger Button - Fixed position and hover */
+  .ham {
     position: fixed;
-    z-index: 100;
-}
-
-.top, .buttom {
+    left: 40px;
+    top: 20px;
+    z-index: 1001;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ham img {
+    width: 25px;
+    height: 20px;
+  }
+  
+  .ham:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    /* transform: scale(1.1); */
+  }
+  
+  /* Navigation Elements */
+  .top, .buttom {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
-}
-
-.menu {
-    width: 90%;
-    padding: 0 1rem;
+    gap: 1.5rem;
+  }
+  
+  .menu {
+    width: 180px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.menu img {
+    padding: 0.5rem;
+  }
+  
+  .menu img {
     height: clamp(30px, 3vw, 40px);
-    width: clamp(30px, 3vw, 40px);
+    width: clamp(39px, 3vw, 40px);
     padding: 8px;
     transition: all 0.3s ease;
-}
-.hamburger:hover{
-    background-color: rgba(255, 255, 255,0.15);
+  }
+  
+  .hamburger:hover{
     border-radius: 5px;
     transform: scale(1.1);
-}
-.homeicon:hover{
-    background-color: rgba(255, 255, 255,0.15);
-    border-radius: 5px;
-    transform: scale(1.1);
-}
-.Play, .Solver, .help {
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+  }
+
+  .Play, .Solver, .help {
+    color: #f0f0f0;
     width: 90%;
     padding: 0.8rem;
     border-radius: 8px;
@@ -67,26 +93,22 @@ nav {
     font-size: clamp(1.2rem, 2vw, 1.7rem);
     transition: all 0.3s ease;
     cursor: pointer;
-}
-
-.Play img, .Solver img {
+  }
+  
+  .Play img, .Solver img {
     height: clamp(35px, 4vw, 50px);
     width: clamp(35px, 4vw, 50px);
-}
-
-.help img {
+  }
+  
+  .help img {
     height: clamp(25px, 3vw, 35px);
     width: clamp(25px, 3vw, 35px);
-}
-
-
-.Play:hover, 
-.Solver:hover, 
-.help:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    transform: translateX(5px);
-}
-
+  }
+  
+  .Play:hover, .Solver:hover, .help:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(2px);
+  }
 /* Main Screen Styles */
 .screen {
     flex: 1;
@@ -150,6 +172,162 @@ nav {
     margin-top: 1rem;
 }
 
+.user-profile {
+    position: fixed;
+    top: 20px;
+    right: 40px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border-radius: 25px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.user-profile:not(.expanded):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.user-profile.expanded {
+    border-radius: 12px;
+    width: 200px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+    transform: none !important;
+}
+
+.user-profile.expanded .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.profile-icon {
+    width: 35px;
+    height: 35px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.username {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0;
+}
+
+.profile-content {
+    display: none;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.user-profile.expanded .profile-content {
+    display: flex;
+}
+
+.score-display {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.4rem;
+}
+
+.score-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+}
+
+.score-value {
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.dropdown-item {
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.delete-profile {
+    color: #dc2626;
+}
+
+.delete-profile:hover {
+    background-color: #fee2e2;
+}
+
+.logout {
+    color: white;
+    background-color: #dc2626;
+    margin-top: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.logout:hover {
+    background-color: #b91c1c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .user-profile {
+        top: 10px;
+        right: 20px;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .user-profile.expanded {
+        width: 180px;
+    }
+    
+    .profile-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .username {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-profile {
+        top: 10px;
+        right: 10px;
+    }
+}
+
 /* Media Queries */
 @media (max-width: 768px) {
     nav {
@@ -178,3 +356,46 @@ nav {
         padding: 1rem;
     }
 }
+
+@media (max-width: 768px) {
+    nav {
+        min-width: 60px;
+    }
+    
+    .Play p, .Solver p, .help p {
+        display: none;
+    }
+    
+    .Play, .Solver, .help {
+        justify-content: center;
+    }
+    
+    .screen {
+        margin-left: 60px;
+    }
+}
+
+@keyframes float {  
+    0% {  
+        transform: translateY(0);  
+    }  
+    50% {  
+        transform: translateY(-20px);  
+    }  
+    100% {  
+        transform: translateY(0);  
+    }  
+}  
+
+.part1, .part2 {  
+    animation: float 3s ease-in-out infinite;  
+}  
+
+/* Optional: Stagger the animation for a more dynamic effect */  
+.part1 {  
+    animation-delay: 0.2s;  
+}  
+
+.part2 {  
+    animation-delay: 0.23s;  
+}  
