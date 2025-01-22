@@ -3,11 +3,15 @@ from django.contrib import admin
 from Sudoku import views
 
 urlpatterns = [
-    path('', views.index_view, name='index'), 
-    path('login/', views.login_view, name='login'),  
     path('level/', views.level_view, name='level'),  
-    path('grid/', views.grid_view, name='grid'),  
-    path('solver/', views.solver_view, name='solver'), 
+    path('play/', views.grid_view, name='play'),  
+    path('', views.index_view, name='home'),  
+    path('solver/', views.solver_view, name='solver'),  
+    path('save-game-state/', views.save_game_state, name='save_game_state'),
+    path('change-username/', views.change_username, name='change_username'),
+    path('delete-profile/', views.delete_profile, name='delete_profile'),
+    path('logout/', views.custom_logout, name='logout'),
+    path('login/', views.view_login, name='login'),
     path('solve/', views.solve_sudoku, name='solve_sudoku'),
     path('generate/', views.generate_sudoku, name='generate_sudoku'), 
 ]
