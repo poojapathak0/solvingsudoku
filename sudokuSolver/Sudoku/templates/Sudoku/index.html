@@ -15,45 +15,27 @@
 </head>
 
 <body>
+    {% csrf_token %}
+    <div class ="sidebar" id = "sidebar">
     <nav>
         <div class="top">
 
             <div class="menu">
                 <div class="hamburger" id="hamburgerbutton">
-                    <a href="{% url 'index' %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
-                </a>
                 </div>
-                <script>
-                    document.getElementById('hamburgerbutton').addEventListener('click', function() {
-                        window.location.href = 'index.html';
-                    });
-                </script>
                 
-                <div class="homeicon" id="homebutton">
-                    <a href="{% url 'index' %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem">
-                    <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
-                </a>
-                </div>
-                <script>
-                    document.getElementById('homebutton').addEventListener('click', function() {
-                        window.location.href = 'index.html';
-                    });
-                </script>
+               
             </div>
             <div class="Play" id="playbutton">
-                <a href="{% url 'login' %}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <a href="{% if not user.is_authenticated %}{% url 'login' %}{% else %}{% url 'play' %}{% endif %}" 
+                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
                     <p>Play</p>
                 </a>
             </div>
             
             <!-- JavaScript (Optional if not using anchor tag) -->
-            <script>
-                document.getElementById('playbutton').addEventListener('click', function() {
-                    window.location.href = 'login.html';
-                });
-            </script>
            
            
             <div class="Play" id="solverbutton">
@@ -64,12 +46,6 @@
                 </div>
            
             
-            <!-- JavaScript (Optional if not using anchor tag) -->
-            <script>
-                document.getElementById('solverbutton').addEventListener('click', function() {
-                    window.location.href = 'solver.html';
-                });
-            </script>
             </div>
 
             <div class="buttom">
@@ -79,8 +55,36 @@
                 </div>
             </div>
     </nav>
+    </div>
 
     <div class="screen">
+        {% if user.is_authenticated %}
+        <div class="user-profile" id="userProfile">
+            <div class="profile-header">
+                <div class="profile-icon">
+                    <img src="{% static 'Sudoku/images/profile.jpg' %}" alt="Profile Icon">
+                </div>
+                <p class="username">{{ username|default:user.username }}</p> </p>
+            </div>
+            <div class="profile-content">
+                <div class="score-display">
+                    <p class="score-label">Highest Score</p>
+                    <p class="score-value">{{ high_score|default:0 }}</p>
+                </div>
+                <div class="dropdown-item" onclick="changeUsername()">
+                    <img src="{% static 'Sudoku/images/change.png' %}" alt="Edit" width="16" height="16">
+                    Change Username
+                </div>
+                <div class="dropdown-item delete-profile" onclick="deleteProfile()">
+                    <img src="{% static 'Sudoku/images/delete.png' %}" alt="Delete" width="16" height="16">
+                    Delete Profile
+                </div>
+                <div class="logout" onclick="logoutUser()">
+                    Logout
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="cube">
             <img src="{% static 'Sudoku/images/cube.svg'%}" alt="" srcset="">
         </div>
@@ -97,7 +101,102 @@
             <img src="{% static 'Sudoku/images/joy.svg'%}" alt="">
         </div>
     </div>
-    <script src=""></script>
+    <script>
+    const userProfile = document.getElementById('userProfile');
+    if (userProfile) {
+        userProfile.classList.add('authenticated');
+        
+        userProfile.addEventListener('click', (event) => {
+            event.stopPropagation();
+            userProfile.classList.toggle('expanded');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!userProfile.contains(event.target)) {
+                userProfile.classList.remove('expanded');
+            }
+        });
+    }
+
+    // Change username function
+    function changeUsername() {
+    const newUsername = prompt('Enter new username:');
+    if (newUsername && newUsername.trim() !== '') {
+        fetch('/change-username/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({username: newUsername.trim()})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update username in the UI immediately
+                document.querySelector('.username').textContent = newUsername.trim();
+                // Optional: Show success message
+                alert('Username successfully changed!');
+            } else {
+                // Show error message
+                alert(data.error || 'Failed to change username');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while changing username');
+        });
+    }
+}
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    // Delete profile function
+    function deleteProfile() {
+    if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('/delete-profile/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to home page after successful deletion
+                window.location.href = '/';
+            } else {
+                alert('Failed to delete profile. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the profile.');
+        });
+    }
+}
+
+function logoutUser() {
+    window.location.href = "{% url 'logout' %}";
+}
+    </script>
 </body>
 
 </html>
