@@ -15,6 +15,7 @@
 </head>
 
 <body>
+    {% csrf_token %}
     <div class="ham">
         <button id = "ham" class="ham"><img id="ham" src="{% static 'Sudoku/images/ham1.png' %}" alt="" srcset=""></button>
     </div>
@@ -27,17 +28,29 @@
                     <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
                 </div>
                 <div class="homeicon">
+                    <a href = "{% url 'home' %}">
                     <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
+                </a>
                 </div>
             </div>
-            <div class="Play">
-                <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
-                <p>Play</p>
-            </div>
-            <div class="Solver">
-                <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">
-                <p>Solver</p>
-            </div>
+            <div class="Play" id="playbutton" onclick="navigateToLevel()">  
+                <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">  
+                <p>Play</p>  
+            </div>  
+            
+            <div class="Play" id="solverbutton" onclick="navigateToSolver()">  
+                <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">  
+                <p>Solver</p>  
+            </div>  
+            <script>  
+                function navigateToLevel() {  
+                    window.location.href = "{% url 'level' %}";  
+                }  
+            
+                function navigateToSolver() {  
+                    window.location.href = "{% url 'solver' %}";  
+                }  
+            </script>
             </div>
 
             <div class="buttom">
@@ -74,28 +87,33 @@
 </div>
 
 <!-- Add this right after the opening <body> tag -->
-    <div class="user-profile" id="userProfile">
-        <div class="profile-header">
-            <div class="profile-icon">
-                <img src="{% static 'Sudoku/images/profile.jpg' %}" alt="Profile Icon">
+    {% if user.is_authenticated %}
+        <div class="user-profile" id="userProfile">
+            <div class="profile-header">
+                <div class="profile-icon">
+                    <img src="{% static 'Sudoku/images/profile.jpg' %}" alt="Profile Icon">
+                </div>
+                <p class="username">{{ username|default:user.username }}</p> </p>
             </div>
-            <p class="username">Username</p>
+            <div class="profile-content">
+                <div class="score-display">
+                    <p class="score-label">Highest Score</p>
+                    <p class="score-value">{{ high_score|default:0 }}</p>
+                </div>
+                <div class="dropdown-item" onclick="changeUsername()">
+                    <img src="{% static 'Sudoku/images/change.png' %}" alt="Edit" width="16" height="16">
+                    Change Username
+                </div>
+                <div class="dropdown-item delete-profile" onclick="deleteProfile()">
+                    <img src="{% static 'Sudoku/images/delete.png' %}" alt="Delete" width="16" height="16">
+                    Delete Profile
+                </div>
+                <div class="logout" onclick="logoutUser()">
+                    Logout
+                </div>
+            </div>
         </div>
-        <div class="profile-content">
-            <div class="score-display">
-                <p class="score-label">Highest Score</p>
-                <p class="score-value">850</p>
-            </div>
-            <div class="dropdown-item" onclick="changeUsername()">
-                <img src="{% static 'Sudoku/images/change.png' %}" alt="Edit" width="16" height="16">
-                Change Username
-            </div>
-            <div class="dropdown-item delete-profile" onclick="deleteProfile()">
-                <img src="{% static 'Sudoku/images/delete.png' %}" alt="Delete" width="16" height="16">
-                Delete Profile
-            </div>
-        </div>
-    </div>
+        {% endif %}
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -132,35 +150,90 @@
 
     <script>
         const userProfile = document.getElementById('userProfile');
-    
-        // Toggle dropdown on profile click
+    if (userProfile) {
+        userProfile.classList.add('authenticated');
+        
         userProfile.addEventListener('click', (event) => {
             event.stopPropagation();
             userProfile.classList.toggle('expanded');
         });
-    
-        // Close dropdown when clicking outside
+
         document.addEventListener('click', (event) => {
             if (!userProfile.contains(event.target)) {
                 userProfile.classList.remove('expanded');
             }
         });
-    
-        // Change username function
-        function changeUsername() {
-            const newUsername = prompt('Enter new username:');
-            if (newUsername && newUsername.trim() !== '') {
+    }
+
+    // Change username function
+    function changeUsername() {
+    const newUsername = prompt('Enter new username:');
+    if (newUsername && newUsername.trim() !== '') {
+        fetch('/change-username/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({username: newUsername.trim()})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
                 document.querySelector('.username').textContent = newUsername.trim();
             }
-        }
-    
-        // Delete profile function
-        function deleteProfile() {
-            if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-                // Add profile deletion logic here
-                alert('Profile deleted');
+        });
+    }
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
         }
+    }
+    return cookieValue;
+}
+
+    // Delete profile function
+    function deleteProfile() {
+    if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('/delete-profile/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to home page after successful deletion
+                window.location.href = '/';
+            } else {
+                alert('Failed to delete profile. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the profile.');
+        });
+    }
+}
+
+function logoutUser() {
+    window.location.href = "{% url 'logout' %}";
+}
     </script>
 
 <script>  
@@ -177,6 +250,36 @@
             if (!isClickInside) {  
                 sidebar.classList.remove('active'); // Hide the sidebar  
             }  
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const difficulties = {
+                beginner: 50,
+                easy: 40,
+                medium: 30,
+                hard: 20,
+                extreme: 10
+            };
+    
+            document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
+                element.addEventListener("click", function () {
+                    const difficulty = element.id.split("-")[0]; // Extract difficulty from id
+                    const clues = difficulties[difficulty]; // Get the clue count
+                    fetch('/sudoku/generate/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ clues })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data); // Use this data to render the puzzle on the page
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
         });
 </script>  
 </body>
