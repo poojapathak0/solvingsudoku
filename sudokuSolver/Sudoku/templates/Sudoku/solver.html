@@ -162,7 +162,7 @@ gridContainer.appendChild(cell);
     </div>
     
     <div class="smallrectangle">
-        <p id="solve">Solve</p>
+        <button id="solve">Solve</button> <!--converted p to button cause only then the input data were passed (salina)-->
       </div>
 <script>const hamburger = document.getElementById('ham');  
     const sidebar = document.getElementById('sidebar');  
@@ -440,6 +440,114 @@ gridContainer.appendChild(cell);
             });
         }
     }
+
+
+
+   
+
+    // Clear solver grid
+    function clearSolverGrid() {
+        const cells = document.querySelectorAll('.sudoku-grid .cell');
+        cells.forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('solved');
+        });
+        solverBoard = Array(9).fill().map(() => Array(9).fill(0));
+    }
+
+
+
+    
+//backend for solver salina
+    // Initialize solver-specific event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeSolverGrid();
+
+        // Add solve button listener
+        const solveButton = document.getElementById('solve');
+        if (solveButton) {
+            solveButton.addEventListener('click', solve_Sudoku);
+        }
+
+        // Add clear button listener
+        const clearButton = document.querySelector('.rectangle4');
+        if (clearButton) {
+            clearButton.addEventListener('click', clearSolverGrid);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure the Solve button exists and attach the event listener
+        const solveButton = document.getElementById('solve');
+        if (solveButton) {
+            solveButton.addEventListener('click', solveSudoku);
+        } else {
+            console.error("Solve button not found in the DOM.");
+        }
+    });
+    
+    // Function to handle solving the Sudoku
+    function solveSudoku() {
+        console.log("Solve button clicked!");
+    
+        const cells = document.querySelectorAll('.sudoku-grid .cell');
+        const formData = new FormData();
+    
+        // Collect grid data from the cells
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                const index = row * 9 + col;
+                const value = cells[index].textContent.trim();
+    
+                if (value && /^[1-9]$/.test(value)) {
+                    formData.append(`cell_${row}_${col}`, value);
+                }
+            }
+        }
+    
+        // Retrieve CSRF token for the request
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+        // Send the grid data to the backend
+        fetch('/solve-sudoku/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.solved) {
+                    console.log("Sudoku solved successfully:", data.solution);
+                    updateGrid(data.solution);
+                } else {
+                    alert(data.error || "Failed to solve the Sudoku.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error during solve request:", error);
+                alert("An error occurred while solving the Sudoku.");
+            });
+    }
+    
+    // Function to update the grid with the solution
+    function updateGrid(solution) {
+        const cells = document.querySelectorAll('.sudoku-grid .cell');
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                const index = row * 9 + col;
+                cells[index].textContent = solution[row][col] || '';
+                cells[index].classList.add('solved'); // Optional styling
+            }
+        }
+    }
+    
     </script>
 
 </body>

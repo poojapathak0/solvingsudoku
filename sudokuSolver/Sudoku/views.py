@@ -12,7 +12,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 # Create your views here.
 
-@csrf_exempt
+
 
 def index(request):  
     context = {}  
@@ -158,14 +158,12 @@ def generate_sudoku(request):
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
+@csrf_exempt
 def solve_sudoku(request):
     if request.method == 'POST':
         try:
-            # Create 9x9 board from form data
             board = [[0 for _ in range(9)] for _ in range(9)]
             
-            # Fill the board with submitted values
             for row in range(9):
                 for col in range(9):
                     cell_name = f'cell_{row}_{col}'
@@ -173,22 +171,27 @@ def solve_sudoku(request):
                     if value and value.isdigit() and 1 <= int(value) <= 9:
                         board[row][col] = int(value)
 
-            # Try to solve the board
             if solve_with_heuristic(board):
-                return render(request, 'Sudoku/solver.html', {
+                return JsonResponse({
+                    'solved': True, 
                     'solution': board
                 })
             else:
-                return render(request, 'Sudoku/solver.html', {
-                    'error': 'No solution exists for this puzzle'
+                return JsonResponse({
+                    'solved': False, 
+                    'error': 'No solution exists'
                 })
         except Exception as e:
-            return render(request, 'Sudoku/solver.html', {
-                'error': f'Error solving puzzle: {str(e)}'
+            print(f"Exception in solve_sudoku: {e}")
+            return JsonResponse({
+                'solved': False, 
+                'error': str(e)
             })
 
-    # For GET request, just show empty board
-    return render(request, 'Sudoku/solver.html')
+    return JsonResponse({
+        'solved': False, 
+        'error': 'Invalid request method'
+    })
 
 
 def game_view(request):

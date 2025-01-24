@@ -12,6 +12,6 @@ urlpatterns = [
     path('delete-profile/', views.delete_profile, name='delete_profile'),
     path('logout/', views.custom_logout, name='logout'),
     path('login/', views.view_login, name='login'),
-    path('solve/', views.solve_sudoku, name='solve_sudoku'),
+    path('solve-sudoku/', views.solve_sudoku, name='solve_sudoku'),
     path('generate/', views.generate_sudoku, name='generate_sudoku'), 
 ]
