@@ -159,6 +159,38 @@ def generate_sudoku(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+def solve_sudoku(request):
+    if request.method == 'POST':
+        try:
+            # Create 9x9 board from form data
+            board = [[0 for _ in range(9)] for _ in range(9)]
+            
+            # Fill the board with submitted values
+            for row in range(9):
+                for col in range(9):
+                    cell_name = f'cell_{row}_{col}'
+                    value = request.POST.get(cell_name, '').strip()
+                    if value and value.isdigit() and 1 <= int(value) <= 9:
+                        board[row][col] = int(value)
+
+            # Try to solve the board
+            if solve_with_heuristic(board):
+                return render(request, 'Sudoku/solver.html', {
+                    'solution': board
+                })
+            else:
+                return render(request, 'Sudoku/solver.html', {
+                    'error': 'No solution exists for this puzzle'
+                })
+        except Exception as e:
+            return render(request, 'Sudoku/solver.html', {
+                'error': f'Error solving puzzle: {str(e)}'
+            })
+
+    # For GET request, just show empty board
+    return render(request, 'Sudoku/solver.html')
+
+
 def game_view(request):
     if request.user.is_authenticated:
         game_data = UserInfo.objects.get(user=request.user)
