@@ -204,3 +204,36 @@ def save_game_state(request):
         
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def solve_sudoku(request):
+    if request.method == 'POST':
+        try:
+             board = [[0 for _ in range(9)] for _ in range(9)]
+             for row in range(9):
+                for col in range(9):
+                    cell_name = f'cell_{row}_{col}'
+                    value = request.POST.get(cell_name, '').strip()
+                    if value and value.isdigit() and 1 <= int(value) <= 9:
+                        board[row][col] = int(value)
+             if solve_with_heuristic(board):
+                 return JsonResponse({
+                    'solved': True, 
+                    'solution': board
+                })
+             else:
+                return JsonResponse({
+                'solved': False, 
+                'error': 'No solution exists'
+                })
+        except Exception as e:
+            print(f"Exception in solve_sudoku: {e}")
+        return JsonResponse({
+            'solved': False, 
+            'error': str(e)
+        })
+    return JsonResponse({
+        'solved': False, 
+        'error': 'Invalid request method'
+    })
+
