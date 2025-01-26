@@ -243,6 +243,43 @@
 
 <script>      
 
+function renderPuzzle(puzzle) {
+    console.log('Puzzle received:', puzzle); // Add this logging
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach((cell, index) => {
+        const row = Math.floor(index / 9);
+        const col = index % 9;
+        const value = puzzle[row][col];
+        
+        console.log(`Cell (${row},${col}): ${value}`); // Add detailed logging
+        
+        if (value !== 0) {
+            cell.textContent = value;
+            cell.classList.add('pre-filled');
+            // cell.setAttribute('disabled', true);
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeGrid();
+    initializeNumberButtons();
+
+    // Load puzzle from session storage
+    const puzzleData = sessionStorage.getItem('sudokuPuzzle');
+    console.log('Stored puzzle data:', puzzleData); // Add this logging
+    
+    if (puzzleData) {
+        try {
+            const puzzle = JSON.parse(puzzleData);
+            renderPuzzle(puzzle);
+            sessionStorage.removeItem('sudokuPuzzle'); // Clear after loading
+        } catch (error) {
+            console.error('Error parsing puzzle:', error);
+        }
+    }
+});
+
 //JS for userprofile
 const userProfile = document.getElementById('userProfile');
     if (userProfile) {
@@ -447,8 +484,10 @@ function highlightRelatedCells(cell) {
             c.classList.add('highlighted');
         }
     });
+    
+    // Ensure the originally selected cell remains distinctly highlighted
+    cell.classList.add('selected');
 }
-
 // Check if move is valid
 function isValidMove(row, col, num) {
     // Check row
