@@ -12,7 +12,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 # Create your views here.
 
-
+@csrf_exempt
 
 def index(request):  
     context = {}  
@@ -20,16 +20,22 @@ def index(request):
         try:  
             # Retrieve the UserInfo associated with the user  
             user_info = UserInfo.objects.get(user=request.user)  
-            context['high_score'] = user_info.high_score   
+            context['high_score'] = user_info.high_score or 0
             context['username'] = request.user.username  
 
             print("User:", request.user)  
             print("Username:", context['username'])  
             print("High Score:", context['high_score']) 
         except UserInfo.DoesNotExist:  
+            # If UserInfo doesn't exist, create it with default values
+            UserInfo.objects.create(
+                user=request.user, 
+                username=request.user.username, 
+                high_score=0
+            )
             context['username'] = request.user.username  
             context['high_score'] = 0  
-    return render(request, 'index.html', context)  
+    return render(request, 'index.html', context)
 
 @login_required  
 def change_username(request):  
@@ -59,7 +65,8 @@ def change_username(request):
             
             return JsonResponse({  
                 'success': True,   
-                'username': new_username  
+                'username': new_username,
+                'high_score': user_info.high_score or 0  # Include high score in response
             })  
         
         except Exception as e:  
@@ -68,7 +75,7 @@ def change_username(request):
                 'error': str(e)  
             })  
     
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})  
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @login_required
 def delete_profile(request):
@@ -88,47 +95,51 @@ def custom_logout(request):
         return redirect('solver')
     return redirect('home')
 
-
-def view_login(request):  
-    if request.method == 'POST':  
-        username = request.POST.get('username')  
+def view_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
         
-        if not username or username.strip() == '':  
-            messages.error(request, 'Username cannot be empty')  
-            return render(request, 'Sudoku/login.html')  
+        if not username or username.strip() == '':
+            messages.error(request, 'Username cannot be empty')
+            return render(request, 'Sudoku/login.html')
         
-        try:  
-            # Create or get user  
-            user, created = User.objects.get_or_create(  
-                username=username.strip()  
-            )  
+        try:
+            # Check if username exists
+            user = User.objects.filter(username=username.strip()).first()
             
-            # Create or get UserInfo profile  
-            user_info, profile_created = UserInfo.objects.get_or_create(  
-                user=user,  
-                defaults={  
-                    'username': username.strip(),  
-                    'high_score': 0  
-                }  
-            )  
+            # If user doesn't exist, create a new non-staff user
+            if not user:
+                user = User.objects.create_user(
+                    username=username.strip(),
+                    is_staff=False
+                )
             
-            # Ensure username is up to date  
-            if user_info.username != username.strip():  
-                user_info.username = username.strip()  
-                user_info.save()  
+            # Prevent staff/superuser login
+            if user.is_staff:
+                messages.error(request, 'Admin users cannot log in through this portal')
+                return render(request, 'Sudoku/login.html')
             
-            # Log the user in  
-            login(request, user)  
+            # Create or get UserInfo profile
+            user_info, profile_created = UserInfo.objects.get_or_create(
+                user=user,
+                defaults={
+                    'username': username.strip(),
+                    'high_score': 0
+                }
+            )
             
-            messages.success(request, 'Login successful!')  
-            return redirect('level')  
+            # Log the user in
+            login(request, user)
+            
+            messages.success(request, 'Login successful!')
+            return redirect('level')
         
-        except Exception as e:  
-            print(f"Login error: {e}")  
-            messages.error(request, f'Login failed: {str(e)}')  
-            return render(request, 'Sudoku/login.html')  
+        except Exception as e:
+            print(f"Login error: {e}")
+            messages.error(request, f'Login failed: {str(e)}')
+            return render(request, 'Sudoku/login.html')
     
-    return render(request, 'Sudoku/login.html')  
+    return render(request, 'Sudoku/login.html')
 
 def index_view(request):
     return render(request, 'Sudoku/index.html')
@@ -149,50 +160,23 @@ def generate_sudoku(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
-            clues = body.get('clues', 36)  # Default to 36 clues if not provided
+            clues = body.get('clues')  # Default to 36 if not provided, but should now use sent value
+            
+            print(f"Received clues: {clues}")  # Debug print
+            
             base_grid = generate_base_grid()
             shuffled_grid = shuffle_grid(base_grid)
             sudoku_puzzle = create_puzzle(shuffled_grid, clues)
+            
+            print(f"Generated puzzle with {clues} clues:")
+            for row in sudoku_puzzle:
+                print(row)
+            
             return JsonResponse({'puzzle': sudoku_puzzle})
         except Exception as e:
+            print(f"Error generating sudoku: {e}")
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-@csrf_exempt
-def solve_sudoku(request):
-    if request.method == 'POST':
-        try:
-            board = [[0 for _ in range(9)] for _ in range(9)]
-            
-            for row in range(9):
-                for col in range(9):
-                    cell_name = f'cell_{row}_{col}'
-                    value = request.POST.get(cell_name, '').strip()
-                    if value and value.isdigit() and 1 <= int(value) <= 9:
-                        board[row][col] = int(value)
-
-            if solve_with_heuristic(board):
-                return JsonResponse({
-                    'solved': True, 
-                    'solution': board
-                })
-            else:
-                return JsonResponse({
-                    'solved': False, 
-                    'error': 'No solution exists'
-                })
-        except Exception as e:
-            print(f"Exception in solve_sudoku: {e}")
-            return JsonResponse({
-                'solved': False, 
-                'error': str(e)
-            })
-
-    return JsonResponse({
-        'solved': False, 
-        'error': 'Invalid request method'
-    })
-
 
 def game_view(request):
     if request.user.is_authenticated:
