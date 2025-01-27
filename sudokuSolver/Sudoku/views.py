@@ -4,8 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from .heuristicSolver import solve_with_heuristic
-from .puzzleGenerator import generate_base_grid, shuffle_grid, create_puzzle
+from .heuristicSolver2 import solve_with_optimized_heuristic
+from .puzzleGenerator2 import generate_sudoku
 from .models import UserInfo
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -216,7 +216,7 @@ def solve_sudoku(request):
                     value = request.POST.get(cell_name, '').strip()
                     if value and value.isdigit() and 1 <= int(value) <= 9:
                         board[row][col] = int(value)
-             if solve_with_heuristic(board):
+             if solve_with_optimized_heuristic(board):
                  return JsonResponse({
                     'solved': True, 
                     'solution': board

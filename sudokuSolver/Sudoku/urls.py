@@ -13,6 +13,5 @@ urlpatterns = [
     path('logout/', views.custom_logout, name='logout'),
     path('login/', views.view_login, name='login'),
     path('solve-sudoku/', views.solve_sudoku, name='solve_sudoku'),
-    # path('generate/', views.generate_sudoku, name='generate_sudoku'), 
     path('sudoku/generate/', views.sudokuGenerate, name='generate_sudoku'),
 ]
