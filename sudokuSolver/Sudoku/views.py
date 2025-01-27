@@ -156,7 +156,7 @@ def grid_view(request):
 def solver_view(request):
     return render(request, 'Sudoku/solver.html')
 
-def generate_sudoku(request):
+def sudokuGenerate(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
@@ -164,9 +164,9 @@ def generate_sudoku(request):
             
             print(f"Received clues: {clues}")  # Debug print
             
-            base_grid = generate_base_grid()
-            shuffled_grid = shuffle_grid(base_grid)
-            sudoku_puzzle = create_puzzle(shuffled_grid, clues)
+            # base_grid = generate_base_grid()
+            # shuffled_grid = shuffle_grid(base_grid)
+            sudoku_puzzle = generate_sudoku(clues)
             
             print(f"Generated puzzle with {clues} clues:")
             for row in sudoku_puzzle:
