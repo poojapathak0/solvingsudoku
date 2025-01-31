@@ -120,8 +120,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const difficulties = {
         beginner: 50,
         easy: 40,
-        medium: 30,
-        hard: 25,
+        medium: 35,
+        hard: 27,
         extreme: 20
     };
 
@@ -153,8 +153,9 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 console.log('Puzzle generated:', data.puzzle);
                 
-                // Store puzzle in session storage
-                sessionStorage.setItem('sudokuPuzzle', JSON.stringify(data.puzzle));
+                 // Store puzzle and solution in session storage
+                 sessionStorage.setItem('sudokuPuzzle', JSON.stringify(data.puzzle));
+                sessionStorage.setItem('solutionBoard', JSON.stringify(data.solutionBoard));
                 
                 // Redirect to play page
                 window.location.href = "{% url 'play' %}";
@@ -165,6 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
         const userProfile = document.getElementById('userProfile');
     if (userProfile) {
         userProfile.classList.add('authenticated');
@@ -250,9 +252,7 @@ function getCookie(name) {
 function logoutUser() {
     window.location.href = "{% url 'logout' %}";
 }
-    </script>
 
-<script>  
     // JavaScript for toggling the sidebar  
     const hamburger = document.getElementById('ham');  
     const sidebar = document.getElementById('sidebar');  
@@ -268,35 +268,7 @@ function logoutUser() {
             }  
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const difficulties = {
-                beginner: 50,
-                easy: 40,
-                medium: 30,
-                hard: 20,
-                extreme: 10
-            };
-    
-            document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
-                element.addEventListener("click", function () {
-                    const difficulty = element.id.split("-")[0]; // Extract difficulty from id
-                    const clues = difficulties[difficulty]; // Get the clue count
-                    fetch('/sudoku/generate/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({ clues })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data); // Use this data to render the puzzle on the page
-                    })
-                    .catch(error => console.error('Error:', error));
-                });
-            });
-        });
+
 </script>  
 </body>
 

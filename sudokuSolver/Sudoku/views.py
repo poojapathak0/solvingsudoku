@@ -156,6 +156,7 @@ def grid_view(request):
 def solver_view(request):
     return render(request, 'Sudoku/solver.html')
 
+@csrf_exempt
 def sudokuGenerate(request):
     if request.method == 'POST':
         try:
@@ -166,13 +167,13 @@ def sudokuGenerate(request):
             
             # base_grid = generate_base_grid()
             # shuffled_grid = shuffle_grid(base_grid)
-            sudoku_puzzle = generate_sudoku(clues)
+            sudoku_puzzle, solved_board = generate_sudoku(clues)
             
             print(f"Generated puzzle with {clues} clues:")
             for row in sudoku_puzzle:
                 print(row)
             
-            return JsonResponse({'puzzle': sudoku_puzzle})
+            return JsonResponse({'puzzle': sudoku_puzzle,'solutionBoard':solved_board})
         except Exception as e:
             print(f"Error generating sudoku: {e}")
             return JsonResponse({'error': str(e)}, status=400)
