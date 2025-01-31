@@ -245,17 +245,121 @@
     // Global variables
     let selectedCell = null;
     let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
-    let solutionBoard = null; // Initialize solutionBoard at the global scope
-     
+    let solutionBoard = null;
+    let gameHistory = []; // Initialize game history array
+    const cells = document.querySelectorAll('.cell');
+
      // Initialize the grid
-     function initializeGrid() {
-         const cells = document.querySelectorAll('.cell');
-         cells.forEach((cell, index) => {
-             cell.setAttribute('tabindex', '0'); // Make cells focusable
-             cell.addEventListener('click', () => selectCell(cell)); // Select cell on click
-             cell.addEventListener('keydown', (e) => handleKeyInput(e, cell)); // Handle keyboard input
-         });
-     }
+    // Initialize game controls
+    function initializeGameControls() {
+        // Get control buttons
+        const undoBtn = document.querySelector('#undo').parentElement;
+        const eraseBtn = document.querySelector('#erase').parentElement;
+        const notesBtn = document.querySelector('#notes').parentElement;
+
+        // Initialize history tracking
+        gameHistory = [];
+
+        // Erase button functionality
+        if (eraseBtn) {
+            eraseBtn.addEventListener('click', handleErase);
+        } else {
+            console.error('Erase button not found');
+        }
+
+        // Undo button functionality
+        if (undoBtn) {
+            undoBtn.addEventListener('click', handleUndo);
+        } else {
+            console.error('Undo button not found');
+        }
+
+        // Notes button functionality
+        if (notesBtn) {
+            notesBtn.addEventListener('click', handleNotes);
+        }
+    }
+
+    function recordHistory(cell) {
+        if (!cell) return;
+        
+        const cellIndex = [...cells].indexOf(cell);
+        const row = Math.floor(cellIndex / 9);
+        const col = cellIndex % 9;
+        
+        gameHistory.push({
+            element: cell,
+            value: gameBoard[row][col],
+            row: row,
+            col: col,
+            timestamp: Date.now()
+        });
+
+        // Limit history to last 50 moves
+        if (gameHistory.length > 50) {
+            gameHistory.shift();
+        }
+    }
+
+    function handleErase() {
+        if (!selectedCell || selectedCell.classList.contains('pre-filled')) {
+            return;
+        }
+
+        const cellIndex = [...cells].indexOf(selectedCell);
+        const row = Math.floor(cellIndex / 9);
+        const col = cellIndex % 9;
+
+        // Record current state before erasing
+        recordHistory(selectedCell);
+
+        // Clear cell
+        selectedCell.textContent = '';
+        gameBoard[row][col] = 0;
+        selectedCell.classList.remove('correct-number');
+    }
+
+    // Handle undo functionality
+    function handleUndo() {
+        if (gameHistory.length === 0) {
+            return;
+        }
+
+        const lastMove = gameHistory.pop();
+        if (!lastMove || !lastMove.element) {
+            return;
+        }
+
+        // Restore the previous state
+        const cell = lastMove.element;
+        const row = lastMove.row;
+        const col = lastMove.col;
+
+        // Update the cell and game board
+        cell.textContent = lastMove.value || '';
+        gameBoard[row][col] = lastMove.value;
+
+        // Restore classes
+        cell.classList.remove('correct-number');
+        if (lastMove.value === solutionBoard[row][col]) {
+            cell.classList.add('correct-number');
+        }
+    }
+
+    // Handle notes functionality
+    function handleNotes() {
+        // Implement notes functionality if needed
+        console.log('Notes functionality not implemented yet');
+    }
+
+    function initializeGrid() {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach((cell, index) => {
+            cell.setAttribute('tabindex', '0');
+            cell.addEventListener('click', () => selectCell(cell));
+            cell.addEventListener('keydown', (e) => handleKeyInput(e, cell));
+        });
+    }
 
      // Handle number input from buttons
      function initializeNumberButtons() {
@@ -268,10 +372,11 @@
             });
         }
     }
-    
+
     document.addEventListener('DOMContentLoaded', () => {
         initializeGrid();
         initializeNumberButtons();
+        initializeGameControls();
     
         // Load puzzle and solution from session storage
     const puzzleData = sessionStorage.getItem('sudokuPuzzle');
@@ -320,35 +425,29 @@ function renderPuzzle(puzzle) {
 }
    
         
-     function enterNumber(num) {
-        if (!selectedCell) {
-            console.log('No cell selected');
+  function enterNumber(num) {
+        if (!selectedCell || selectedCell.classList.contains('pre-filled')) {
             return;
         }
-    
-        const row = Math.floor([...selectedCell.parentNode.children].indexOf(selectedCell) / 9);
-        const col = [...selectedCell.parentNode.children].indexOf(selectedCell) % 9;
-        
-        // Check if solutionBoard exists and is valid
-        if (!solutionBoard || !Array.isArray(solutionBoard) || !solutionBoard[row] || typeof solutionBoard[row][col] === 'undefined') {
-            console.error('Invalid solution board state');
+
+        const row = Math.floor([...cells].indexOf(selectedCell) / 9);
+        const col = [...cells].indexOf(selectedCell) % 9;
+
+        if (!solutionBoard?.[row]?.[col]) {
             return;
         }
-    
-        // Check if the cell was pre-filled
-        if (selectedCell.classList.contains('pre-filled')) {
-            console.log('Cannot modify pre-filled number');
-            return;
-        }
-    
+
+        // Record the current state before making the change
+        recordHistory(selectedCell);
+
         if (solutionBoard[row][col] === num) {
             selectedCell.textContent = num;
             gameBoard[row][col] = num;
             selectedCell.classList.add('correct-number');
             selectedCell.style.animation = 'numberEnter 0.3s ease';
             
-            setTimeout(() => { 
-                selectedCell.style.animation = ''; 
+            setTimeout(() => {
+                selectedCell.style.animation = '';
             }, 300);
             
             if (isPuzzleComplete()) {
@@ -356,8 +455,8 @@ function renderPuzzle(puzzle) {
             }
         } else {
             selectedCell.style.animation = 'invalidMove 0.3s ease';
-            setTimeout(() => { 
-                selectedCell.style.animation = ''; 
+            setTimeout(() => {
+                selectedCell.style.animation = '';
             }, 300);
         }
     }
@@ -407,6 +506,7 @@ function renderPuzzle(puzzle) {
                 if (key >= '1' && key <= '9') {
                     selectCell(cell);
                     enterNumber(parseInt(key));
+                    recordHistory(cell, gameBoard[row][col]);
                 } else if (key === 'Backspace' || key === 'Delete') {
                     if (selectedCell) {
                         selectedCell.textContent = '';
@@ -574,6 +674,7 @@ function logoutUser() {
             }  
         });
         
+
 
     </script>
 </body>
