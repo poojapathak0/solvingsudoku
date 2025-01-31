@@ -1,114 +1,74 @@
-import random  
-import copy  
+import random
+import copy
 
-def is_valid_move(grid, row, col, num):  
-    # Check row  
-    if num in grid[row]:  
-        return False  
+def is_valid_move(grid, row, col, num):
+    # Check row
+    if num in grid[row]:
+        return False
     
-    # Check column  
-    if num in [grid[i][col] for i in range(9)]:  
-        return False  
+    # Check column
+    if num in [grid[i][col] for i in range(9)]:
+        return False
     
-    # Check 3x3 box  
-    start_row, start_col = 3 * (row // 3), 3 * (col // 3)  
-    for i in range(3):  
-        for j in range(3):  
-            if grid[start_row + i][start_col + j] == num:  
-                return False  
+    # Check 3x3 box
+    start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+    for i in range(3):
+        for j in range(3):
+            if grid[start_row + i][start_col + j] == num:
+                return False
     
-    return True  
+    return True
 
-def solve_sudoku(grid):  
-    for row in range(9):  
-        for col in range(9):  
-            if grid[row][col] == 0:  
-                # Shuffle possible numbers  
-                nums = list(range(1, 10))  
-                random.shuffle(nums)  
-                
-                for num in nums:  
-                    if is_valid_move(grid, row, col, num):  
-                        grid[row][col] = num  
-                        
-                        if solve_sudoku(grid):  
-                            return True  
-                        
-                        grid[row][col] = 0  
-                
-                return False  
-    return True  
+def solve_sudoku(grid):
+    empty = find_empty(grid)
+    if not empty:
+        return True
+    
+    row, col = empty
+    for num in random.sample(range(1, 10), 9):
+        if is_valid_move(grid, row, col, num):
+            grid[row][col] = num
+            if solve_sudoku(grid):
+                return True
+            grid[row][col] = 0
+    return False
 
-def count_solutions(grid):  
-    solutions = [0]  
-    
-    def backtrack(grid):  
-        if solutions[0] > 1:  
-            return  
-        
-        for row in range(9):  
-            for col in range(9):  
-                if grid[row][col] == 0:  
-                    for num in range(1, 10):  
-                        if is_valid_move(grid, row, col, num):  
-                            grid[row][col] = num  
-                            
-                            if all(0 not in row for row in grid):  
-                                solutions[0] += 1  
-                                if solutions[0] > 1:  
-                                    return  
-                            
-                            backtrack(grid)  
-                            
-                            grid[row][col] = 0  
-                    return  
-        return  
+def find_empty(grid):
+    for i in range(9):
+        for j in range(9):
+            if grid[i][j] == 0:
+                return (i, j)
+    return None
 
-    backtrack(grid)  
-    return solutions[0]  
-
-def generate_sudoku(difficulty=30):  
-    # Create an empty grid  
-    grid = [[0 for _ in range(9)] for _ in range(9)]  
+def generate_sudoku(clues):
+    # Create empty grid
+    grid = [[0 for _ in range(9)] for _ in range(9)]
     
-    # Solve the empty grid  
-    solution = solve_sudoku(grid)  
+    # Generate a solved sudoku by filling diagonals and solving
+    for i in range(0, 9, 3):
+        nums = list(range(1, 10))
+        random.shuffle(nums)
+        for j in range(3):
+            for k in range(3):
+                grid[i + j][i + k] = nums.pop()
     
-    # Randomize positions for removal  
-    positions = [(row, col) for row in range(9) for col in range(9)]  
-    random.shuffle(positions)  
+    # Solve the grid
+    solve_sudoku(grid)
     
-    # Create a copy of the solved grid  
-    puzzle = [row[:] for row in grid]  
+    # Create a deep copy of the solved grid
+    solution = [row[:] for row in grid]
     
-    # Try to remove numbers  
-    removed = 0  
-    for row, col in positions:  
-        if removed >= 81 - difficulty:  
-            break  
-        
-        # Store the original value  
-        temp = puzzle[row][col]  
-        puzzle[row][col] = 0  
-        
-        # Check if removal creates multiple solutions  
-        grid_copy = [row[:] for row in puzzle]  
-        if count_solutions(grid_copy) > 1:  
-            # If multiple solutions, put the number back  
-            puzzle[row][col] = temp  
-        else:  
-            removed += 1  
+    # Remove numbers to create puzzle
+    cells = [(i, j) for i in range(9) for j in range(9)]
+    random.shuffle(cells)
     
-    return puzzle, solution
-
-# Generate and print a Sudoku puzzle  
-def print_sudoku(grid):  
-    for row in grid:  
-        print(' '.join(str(num) if num != 0 else '.' for num in row))  
-
-# Generate and print multiple Sudoku puzzles  
-# for i in range(3):  
-#     print(f"\nSudoku Puzzle {i+1}:")  
-#     sudoku_puzzle = generate_sudoku(difficulty=40)  # Adjust difficulty (30-50 recommended)  
-#     print_sudoku(sudoku_puzzle)  
-#     print("\n")
+    # Calculate how many cells to empty
+    cells_to_empty = 81 - clues
+    
+    # Remove numbers
+    for i in range(cells_to_empty):
+        if i < len(cells):
+            row, col = cells[i]
+            grid[row][col] = 0
+    
+    return grid, solution

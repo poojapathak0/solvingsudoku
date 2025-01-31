@@ -161,19 +161,24 @@ def sudokuGenerate(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
-            clues = body.get('clues')  # Default to 36 if not provided, but should now use sent value
+            clues = body.get('clues', 30)  # Default to 30 if not provided
             
-            print(f"Received clues: {clues}")  # Debug print
+            print(f"Generating puzzle with {clues} clues")
             
-            # base_grid = generate_base_grid()
-            # shuffled_grid = shuffle_grid(base_grid)
-            sudoku_puzzle, solved_board = generate_sudoku(clues)
+            puzzle, solution = generate_sudoku(clues)
             
-            print(f"Generated puzzle with {clues} clues:")
-            for row in sudoku_puzzle:
+            print("Generated puzzle structure:")
+            for row in puzzle:
+                print(row)
+            print("Generated solution structure:")
+            for row in solution:
                 print(row)
             
-            return JsonResponse({'puzzle': sudoku_puzzle,'solutionBoard':solved_board})
+            return JsonResponse({
+                'puzzle': puzzle,
+                'solutionBoard': solution  
+            })
+            
         except Exception as e:
             print(f"Error generating sudoku: {e}")
             return JsonResponse({'error': str(e)}, status=400)

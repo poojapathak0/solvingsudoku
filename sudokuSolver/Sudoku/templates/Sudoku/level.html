@@ -116,57 +116,58 @@
         {% endif %}
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const difficulties = {
-        beginner: 50,
-        easy: 40,
-        medium: 35,
-        hard: 27,
-        extreme: 20
-    };
-
-    document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
-        element.addEventListener("click", function () {
-            const difficultyText = element.querySelector('p').id; // Get the ID from the <p> tag  
-            const difficulty = difficultyText.split("-")[0]; // Extract difficulty from id  
-            const clues = difficulties[difficulty]; // Get the clue count
-            
-            console.log(difficulty);
-            if (clues === undefined) {  
-                console.error("Invalid difficulty level: " + difficulty);  
-            } else {  
-                console.log("Clue count for " + difficulty + ": " + clues);  
-            }  
-            console.log(`Generating puzzle with ${clues} clues for ${difficulty} difficulty`);
-            
-            fetch('/sudoku/generate/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ 
-                    clues: clues  // Explicitly send the clues value
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Puzzle generated:', data.puzzle);
-                
-                 // Store puzzle and solution in session storage
-                 sessionStorage.setItem('sudokuPuzzle', JSON.stringify(data.puzzle));
-                sessionStorage.setItem('solutionBoard', JSON.stringify(data.solutionBoard));
-                
-                // Redirect to play page
-                window.location.href = "{% url 'play' %}";
-            })
-            .catch(error => {
-                console.error('Error generating puzzle:', error);
+        document.addEventListener("DOMContentLoaded", function () {
+            const difficulties = {
+                beginner: 50,
+                easy: 40,
+                medium: 35,
+                hard: 27,
+                extreme: 20
+            };
+        
+            document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
+                element.addEventListener("click", function () {
+                    const difficultyText = element.querySelector('p').id;
+                    const difficulty = difficultyText.split("-")[0];
+                    const clues = difficulties[difficulty];
+                    
+                    console.log(`Generating puzzle with ${clues} clues for ${difficulty} difficulty`);
+                    
+                    fetch('/sudoku/generate/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({ 
+                            clues: clues
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        
+                        console.log('Puzzle generated:', data.puzzle);
+                        console.log('Solution generated:', data.solutionBoard);
+                        
+                        // Store both puzzle and solution
+                        sessionStorage.setItem('sudokuPuzzle', JSON.stringify(data.puzzle));
+                        sessionStorage.setItem('solutionBoard', JSON.stringify(data.solutionBoard));
+                        
+                        // Redirect to play page
+                        window.location.href = "/play/";
+                    })
+                    .catch(error => {
+                        console.error('Error generating puzzle:', error);
+                        alert('Error generating puzzle. Please try again.');
+                    });
+                });
             });
         });
-    });
-});
 
+        
         const userProfile = document.getElementById('userProfile');
     if (userProfile) {
         userProfile.classList.add('authenticated');
