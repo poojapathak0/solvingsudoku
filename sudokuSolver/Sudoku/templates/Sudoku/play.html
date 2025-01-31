@@ -241,7 +241,33 @@
 </div>
 </div>
 
-<script>      
+<script>     
+     // Grid functionality
+     let selectedCell = null; //keeps track of te currently selected cell
+     let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
+     
+     // Initialize the grid
+     function initializeGrid() {
+         const cells = document.querySelectorAll('.cell');
+         cells.forEach((cell, index) => {
+             cell.setAttribute('tabindex', '0'); // Make cells focusable
+             cell.addEventListener('click', () => selectCell(cell)); // Select cell on click
+             cell.addEventListener('keydown', (e) => handleKeyInput(e, cell)); // Handle keyboard input
+         });
+     }
+
+     // Handle number input from buttons
+     function initializeNumberButtons() {
+        for (let i = 1; i <= 9; i++) {
+            const button = document.querySelector(`.rectangle${i}`);
+            button.addEventListener('click', () => {
+                if (selectedCell) {
+                    enterNumber(i);
+                }
+            });
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
         initializeGrid();
         initializeNumberButtons();
@@ -261,19 +287,7 @@
                 console.error('Error parsing puzzle:', error);
             }
         }
-            // Grid functionality
-        let selectedCell = null; //keeps track of te currently selected cell
-        let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
-        
-        // Initialize the grid
-        function initializeGrid() {
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach((cell, index) => {
-                cell.setAttribute('tabindex', '0'); // Make cells focusable
-                cell.addEventListener('click', () => selectCell(cell)); // Select cell on click
-                cell.addEventListener('keydown', (e) => handleKeyInput(e, cell)); // Handle keyboard input
-            });
-        }
+       
     });
                 
 function renderPuzzle(puzzle) {
@@ -309,17 +323,7 @@ function renderPuzzle(puzzle) {
          highlightRelatedCells(cell);// Highlight related row, column, and box
      }
         
-    // Handle number input from buttons
-    function initializeNumberButtons() {
-            for (let i = 1; i <= 9; i++) {
-                const button = document.querySelector(`.rectangle${i}`);
-                button.addEventListener('click', () => {
-                    if (selectedCell) {
-                        enterNumber(i);
-                    }
-                });
-            }
-        }
+   
         
      // Enter number in selected cell
      function enterNumber(num) {
@@ -404,12 +408,6 @@ function renderPuzzle(puzzle) {
             cell.classList.add('selected');
         }
 
-        
-        // Initialize the game
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeGrid();
-            initializeNumberButtons();
-        });
         
         // Add these styles to your CSS
         const styles = document.createElement('style');
