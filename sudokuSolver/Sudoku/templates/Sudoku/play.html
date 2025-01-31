@@ -401,6 +401,22 @@ function renderPuzzle(puzzle) {
         });
     }
 
+            // Handle keyboard input
+            function handleKeyInput(e, cell) {
+                const key = e.key;
+                if (key >= '1' && key <= '9') {
+                    selectCell(cell);
+                    enterNumber(parseInt(key));
+                } else if (key === 'Backspace' || key === 'Delete') {
+                    if (selectedCell) {
+                        selectedCell.textContent = '';
+                        const row = Math.floor([...cell.parentNode.children].indexOf(cell) / 9);
+                        const col = [...cell.parentNode.children].indexOf(cell) % 9;
+                        gameBoard[row][col] = 0;
+                    }
+                }
+            }
+
       // Select a cell
       function selectCell(cell) {
         // Remove previous selection
