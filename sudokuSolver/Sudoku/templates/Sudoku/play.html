@@ -242,9 +242,10 @@
 </div>
 
 <script>     
-     // Grid functionality
-     let selectedCell = null; //keeps track of te currently selected cell
-     let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
+    // Global variables
+    let selectedCell = null;
+    let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
+    let solutionBoard = null; // Initialize solutionBoard at the global scope
      
      // Initialize the grid
      function initializeGrid() {
