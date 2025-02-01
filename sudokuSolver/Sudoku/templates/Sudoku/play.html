@@ -442,8 +442,15 @@ function enterNumber(num) {
     // Record the current state before making the change
     recordHistory(selectedCell);
 
-    // Clear previous error highlights
+    // Clear any existing wrong entries from other cells
     cells.forEach(cell => {
+        if (cell.classList.contains('wrong-entry')) {
+            cell.textContent = '';
+            const cellIndex = [...cells].indexOf(cell);
+            const cellRow = Math.floor(cellIndex / 9);
+            const cellCol = cellIndex % 9;
+            gameBoard[cellRow][cellCol] = 0;
+        }
         cell.classList.remove('wrong-entry', 'conflict-highlight');
     });
 
@@ -502,6 +509,34 @@ function enterNumber(num) {
     }
 }
 
+// Update the selectCell function to clear wrong entries
+function selectCell(cell) {
+    const cells = document.querySelectorAll('.cell');
+    
+    // Clear any existing wrong entries
+    cells.forEach(c => {
+        if (c.classList.contains('wrong-entry')) {
+            c.textContent = '';
+            const cellIndex = [...cells].indexOf(c);
+            const cellRow = Math.floor(cellIndex / 9);
+            const cellCol = cellIndex % 9;
+            gameBoard[cellRow][cellCol] = 0;
+        }
+        c.classList.remove('wrong-entry', 'conflict-highlight');
+    });
+
+    // Remove previous selection
+    if (selectedCell) {
+        selectedCell.classList.remove('selected');
+    }
+    
+    selectedCell = cell;
+    cell.classList.add('selected');
+    
+    // Highlight related cells
+    highlightRelatedCells(cell);
+}
+
 // Add these styles to your CSS
 const highlightStyles = document.createElement('style');
 highlightStyles.textContent = `
@@ -510,7 +545,7 @@ highlightStyles.textContent = `
     }
     
     .conflict-highlight {
-        background-color: rgba(187, 34, 34, 0.2) !important;
+        background-color: rgba(255, 0, 0, 0.2) !important;
     }
     
     @keyframes numberEnter {
@@ -525,6 +560,7 @@ highlightStyles.textContent = `
     }
 `;
 document.head.appendChild(highlightStyles);
+
 
     function isPuzzleComplete() {
         for (let row = 0; row < 9; row++) {
@@ -565,6 +601,22 @@ document.head.appendChild(highlightStyles);
         });
     }
 
+    
+      // Select a cell
+      function selectCell(cell) {
+        // Remove previous selection
+        if (selectedCell) {
+            selectedCell.classList.remove('selected');// Remove previous selection
+        }
+        
+        selectedCell = cell;
+
+        cell.classList.add('selected');// Highlight selected cell
+        
+        // Highlight related cells
+        highlightRelatedCells(cell);// Highlight related row, column, and box
+    }
+       
             // Handle keyboard input
             function handleKeyInput(e, cell) {
                 const key = e.key;
@@ -582,21 +634,6 @@ document.head.appendChild(highlightStyles);
                 }
             }
 
-      // Select a cell
-      function selectCell(cell) {
-        // Remove previous selection
-        if (selectedCell) {
-            selectedCell.classList.remove('selected');// Remove previous selection
-        }
-        
-        selectedCell = cell;
-
-        cell.classList.add('selected');// Highlight selected cell
-        
-        // Highlight related cells
-        highlightRelatedCells(cell);// Highlight related row, column, and box
-    }
-       
     
         
 
