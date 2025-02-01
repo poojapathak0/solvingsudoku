@@ -242,6 +242,8 @@
 </div>
 
 <script>     
+
+    
     // Global variables
     let selectedCell = null;
     let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
@@ -424,7 +426,76 @@ function renderPuzzle(puzzle) {
     });
 }
    
-        
+
+// Add mistake tracking variable at the top with other global variables
+let mistakeCount = 0;
+const MAX_MISTAKES = 3;
+
+// Create game over modal HTML structure
+const gameOverModal = document.createElement('div');
+gameOverModal.innerHTML = `
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over</h2>
+            <p>You lost the game because you made 3 mistakes</p>
+            <div class="button-group">
+                <button class="new-game-btn">New Game</button>
+                <button class="restart-btn">Restart</button>
+            </div>
+        </div>
+    </div>
+`;
+document.body.appendChild(gameOverModal);
+
+// Add styles for the modal
+const modalStyles = document.createElement('style');
+modalStyles.textContent = `
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 80%;
+        width: 300px;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .new-game-btn, .restart-btn {
+        color: #4285f4;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+    }
+
+    .mistake-counter {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 14px;
+        color: #666;
+    }
+`;
+document.head.appendChild(modalStyles);
+
 function enterNumber(num) {
     if (!selectedCell || selectedCell.classList.contains('pre-filled')) {
         return;
@@ -442,7 +513,7 @@ function enterNumber(num) {
     // Record the current state before making the change
     recordHistory(selectedCell);
 
-    // Clear any existing wrong entries from other cells
+    // Clear previous error highlights
     cells.forEach(cell => {
         if (cell.classList.contains('wrong-entry')) {
             cell.textContent = '';
@@ -454,7 +525,6 @@ function enterNumber(num) {
         cell.classList.remove('wrong-entry', 'conflict-highlight');
     });
 
-    // Check if the number is correct according to the solution
     if (solutionBoard[row][col] === num) {
         selectedCell.textContent = num;
         gameBoard[row][col] = num;
@@ -469,25 +539,35 @@ function enterNumber(num) {
             handlePuzzleCompletion();
         }
     } else {
-        // Handle incorrect entry
+        // Increment mistake counter and check for game over
+        mistakeCount++;
+        updateMistakeDisplay();
+        
+        if (mistakeCount >= MAX_MISTAKES) {
+            showGameOver();
+            return;
+        }
+
+        // Handle incorrect entry visualization
         selectedCell.textContent = num;
         gameBoard[row][col] = num;
         selectedCell.classList.add('wrong-entry');
         
+        // Show conflicts (row, column, box highlighting code remains the same)
         // Highlight conflicts in row
         for (let i = 0; i < 9; i++) {
             if (i !== col && gameBoard[row][i] === num) {
                 cells[row * 9 + i].classList.add('conflict-highlight');
             }
         }
-
+        
         // Highlight conflicts in column
         for (let i = 0; i < 9; i++) {
             if (i !== row && gameBoard[i][col] === num) {
                 cells[i * 9 + col].classList.add('conflict-highlight');
             }
         }
-
+        
         // Highlight conflicts in 3x3 box
         const boxStartRow = Math.floor(row / 3) * 3;
         const boxStartCol = Math.floor(col / 3) * 3;
@@ -495,8 +575,8 @@ function enterNumber(num) {
             for (let j = 0; j < 3; j++) {
                 const currentRow = boxStartRow + i;
                 const currentCol = boxStartCol + j;
-                if ((currentRow !== row || currentCol !== col) && 
-                    gameBoard[currentRow][currentCol] === num) {
+                 if ((currentRow !== row || currentCol !== col) && 
+                     gameBoard[currentRow][currentCol] === num) {
                     cells[currentRow * 9 + currentCol].classList.add('conflict-highlight');
                 }
             }
@@ -509,33 +589,45 @@ function enterNumber(num) {
     }
 }
 
-// Update the selectCell function to clear wrong entries
-function selectCell(cell) {
-    const cells = document.querySelectorAll('.cell');
-    
-    // Clear any existing wrong entries
-    cells.forEach(c => {
-        if (c.classList.contains('wrong-entry')) {
-            c.textContent = '';
-            const cellIndex = [...cells].indexOf(c);
-            const cellRow = Math.floor(cellIndex / 9);
-            const cellCol = cellIndex % 9;
-            gameBoard[cellRow][cellCol] = 0;
-        }
-        c.classList.remove('wrong-entry', 'conflict-highlight');
-    });
-
-    // Remove previous selection
-    if (selectedCell) {
-        selectedCell.classList.remove('selected');
+// Function to update mistake display
+function updateMistakeDisplay() {
+    const mistakeText = document.querySelector('.mistake-counter');
+    if (!mistakeText) {
+        const counter = document.createElement('div');
+        counter.className = 'mistake-counter';
+        document.body.appendChild(counter);
     }
-    
-    selectedCell = cell;
-    cell.classList.add('selected');
-    
-    // Highlight related cells
-    highlightRelatedCells(cell);
+    document.querySelector('.mistake-counter').textContent = `Mistakes: ${mistakeCount} / ${MAX_MISTAKES}`;
 }
+
+// Function to show game over modal
+function showGameOver() {
+    const modal = document.getElementById('gameOverModal');
+    modal.style.display = 'flex';
+
+    // Add event listeners for buttons
+    modal.querySelector('.second-chance-btn').onclick = () => {
+        modal.style.display = 'none';
+        // Implement second chance logic here
+        mistakeCount = 0;
+        updateMistakeDisplay();
+    };
+
+    modal.querySelector('.new-game-btn').onclick = () => {
+        window.location.href = '/level/';  // Redirect to level selection
+    };
+
+    modal.querySelector('.restart-btn').onclick = () => {
+        location.reload();  // Reload current game
+    };
+}
+
+// Initialize mistake display when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    updateMistakeDisplay();
+});
+
+
 
 // Add these styles to your CSS
 const highlightStyles = document.createElement('style');
