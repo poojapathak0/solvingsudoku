@@ -425,41 +425,106 @@ function renderPuzzle(puzzle) {
 }
    
         
-  function enterNumber(num) {
-        if (!selectedCell || selectedCell.classList.contains('pre-filled')) {
-            return;
-        }
-
-        const row = Math.floor([...cells].indexOf(selectedCell) / 9);
-        const col = [...cells].indexOf(selectedCell) % 9;
-
-        if (!solutionBoard?.[row]?.[col]) {
-            return;
-        }
-
-        // Record the current state before making the change
-        recordHistory(selectedCell);
-
-        if (solutionBoard[row][col] === num) {
-            selectedCell.textContent = num;
-            gameBoard[row][col] = num;
-            selectedCell.classList.add('correct-number');
-            selectedCell.style.animation = 'numberEnter 0.3s ease';
-            
-            setTimeout(() => {
-                selectedCell.style.animation = '';
-            }, 300);
-            
-            if (isPuzzleComplete()) {
-                handlePuzzleCompletion();
-            }
-        } else {
-            selectedCell.style.animation = 'invalidMove 0.3s ease';
-            setTimeout(() => {
-                selectedCell.style.animation = '';
-            }, 300);
-        }
+function enterNumber(num) {
+    if (!selectedCell || selectedCell.classList.contains('pre-filled')) {
+        return;
     }
+
+    const cells = document.querySelectorAll('.cell');
+    const index = [...cells].indexOf(selectedCell);
+    const row = Math.floor(index / 9);
+    const col = index % 9;
+
+    if (!solutionBoard?.[row]?.[col]) {
+        return;
+    }
+
+    // Record the current state before making the change
+    recordHistory(selectedCell);
+
+    // Clear previous error highlights
+    cells.forEach(cell => {
+        cell.classList.remove('wrong-entry', 'conflict-highlight');
+    });
+
+    // Check if the number is correct according to the solution
+    if (solutionBoard[row][col] === num) {
+        selectedCell.textContent = num;
+        gameBoard[row][col] = num;
+        selectedCell.classList.add('correct-number');
+        selectedCell.style.animation = 'numberEnter 0.3s ease';
+        
+        setTimeout(() => {
+            selectedCell.style.animation = '';
+        }, 300);
+        
+        if (isPuzzleComplete()) {
+            handlePuzzleCompletion();
+        }
+    } else {
+        // Handle incorrect entry
+        selectedCell.textContent = num;
+        gameBoard[row][col] = num;
+        selectedCell.classList.add('wrong-entry');
+        
+        // Highlight conflicts in row
+        for (let i = 0; i < 9; i++) {
+            if (i !== col && gameBoard[row][i] === num) {
+                cells[row * 9 + i].classList.add('conflict-highlight');
+            }
+        }
+
+        // Highlight conflicts in column
+        for (let i = 0; i < 9; i++) {
+            if (i !== row && gameBoard[i][col] === num) {
+                cells[i * 9 + col].classList.add('conflict-highlight');
+            }
+        }
+
+        // Highlight conflicts in 3x3 box
+        const boxStartRow = Math.floor(row / 3) * 3;
+        const boxStartCol = Math.floor(col / 3) * 3;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const currentRow = boxStartRow + i;
+                const currentCol = boxStartCol + j;
+                if ((currentRow !== row || currentCol !== col) && 
+                    gameBoard[currentRow][currentCol] === num) {
+                    cells[currentRow * 9 + currentCol].classList.add('conflict-highlight');
+                }
+            }
+        }
+
+        selectedCell.style.animation = 'invalidMove 0.3s ease';
+        setTimeout(() => {
+            selectedCell.style.animation = '';
+        }, 300);
+    }
+}
+
+// Add these styles to your CSS
+const highlightStyles = document.createElement('style');
+highlightStyles.textContent = `
+    .wrong-entry {
+        color: red !important;
+    }
+    
+    .conflict-highlight {
+        background-color: rgba(187, 34, 34, 0.2) !important;
+    }
+    
+    @keyframes numberEnter {
+        0% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes invalidMove {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+`;
+document.head.appendChild(highlightStyles);
 
     function isPuzzleComplete() {
         for (let row = 0; row < 9; row++) {
@@ -534,22 +599,7 @@ function renderPuzzle(puzzle) {
        
     
         
-        // Add these styles to your CSS
-        const styles = document.createElement('style');
-        styles.textContent = `
-            @keyframes numberEnter {
-                0% { transform: scale(1.2); }
-                100% { transform: scale(1); }
-            }
-            
-            @keyframes invalidMove {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                75% { transform: translateX(5px); }
-            }
-        `;
-        document.head.appendChild(styles);
-        
+
 
         // Deselects a cell if the user clicks outside the grid or number buttons.
         document.addEventListener('click', (event) => {
