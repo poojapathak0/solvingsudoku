@@ -439,8 +439,8 @@ gameOverModal.innerHTML = `
             <h2>Game Over</h2>
             <p>You lost the game because you made 3 mistakes</p>
             <div class="button-group">
-                <button class="new-game-btn">New Game</button>
-                <button class="restart-btn">Restart</button>
+                <button id="newGameBtn" class="new-game-btn" onclick="window.location.href='{% url 'level' %}'">New Game</button>
+                <button id="restartBtn" class="restart-btn">Restart</button>
             </div>
         </div>
     </div>
@@ -479,11 +479,18 @@ modalStyles.textContent = `
     }
 
     .new-game-btn, .restart-btn {
-        color:rgb(229, 158, 44);
+        color: rgb(229, 158, 44);
         background: none;
-        border: none;
+        border: 2px solid rgb(229, 158, 44);
+        border-radius: 5px;
         cursor: pointer;
-        padding: 5px 10px;
+        padding: 8px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .new-game-btn:hover, .restart-btn:hover {
+        background-color: rgb(229, 158, 44);
+        color: white;
     }
 
     .mistake-counter {
@@ -605,26 +612,27 @@ function showGameOver() {
     const modal = document.getElementById('gameOverModal');
     modal.style.display = 'flex';
 
-    // Add event listeners for buttons
-    modal.querySelector('.second-chance-btn').onclick = () => {
+
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
         modal.style.display = 'none';
-        // Implement second chance logic here
-        mistakeCount = 0;
-        updateMistakeDisplay();
-    };
-
-    modal.querySelector('.new-game-btn').onclick = () => {
-        window.location.href = '/level/';  // Redirect to level selection
-    };
-
-    modal.querySelector('.restart-btn').onclick = () => {
         location.reload();  // Reload current game
-    };
+    });
+
+        // Add click event listener to close modal when clicking outside
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
 }
 
-// Initialize mistake display when page loads
+
+// Initialize the modal when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    updateMistakeDisplay();
+    // Ensure the modal is hidden initially
+    const modal = document.getElementById('gameOverModal');
+    modal.style.display = 'none';
 });
 
 
