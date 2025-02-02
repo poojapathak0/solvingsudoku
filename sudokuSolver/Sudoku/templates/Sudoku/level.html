@@ -116,6 +116,13 @@
         {% endif %}
 
     <script>
+        function selectDifficulty(difficulty) {
+            // Store the difficulty in session storage
+            sessionStorage.setItem('difficulty', difficulty);
+            // Redirect to play page
+            window.location.href = "{% url 'play' %}";
+        }
+        
         document.addEventListener("DOMContentLoaded", function () {
             const difficulties = {
                 beginner: 50,

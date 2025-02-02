@@ -148,7 +148,9 @@ def level_view(request):
     return render(request, 'Sudoku/level.html')
 
 def grid_view(request):
-    return render(request, 'Sudoku/play.html')
+    # Get difficulty from session or URL parameter
+    difficulty = request.session.get('difficulty', 'Easy')  # Default to 'Easy' if not set
+    return render(request, 'Sudoku/play.html', {"difficulty" : difficulty})
 
 # def login_view(request):
 #     return render(request, 'Sudoku/login.html')
