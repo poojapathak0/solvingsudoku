@@ -13,32 +13,25 @@ body {
 }
 
 /*display the selected difficulty level above the grid in the play page*/
+.sudoku-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;  /* Centers it vertically if needed */
+  width: 100%;
+}
+
 .difficulty-banner {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 15px; /* Adjust spacing between banner and grid */
-}
-
-.difficulty-container {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.difficulty-text {
-  margin: 0;
-  font-family: 'Karla', sans-serif;
-  color: #333;
-  font-size: 1.5rem;
+  background-color: #f2f2f2;
+  padding: 10px 0;
+  margin-bottom: 20px;
   text-align: center;
 }
 
+
 .difficulty-level {
-  color: rgb(229, 158, 44);
-  font-weight: 600;
+  color: #e59e2c;
   text-transform: capitalize;
 }
 

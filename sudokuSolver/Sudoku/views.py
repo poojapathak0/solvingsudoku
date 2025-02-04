@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 import json
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
@@ -151,6 +152,20 @@ def grid_view(request):
     # Get difficulty from session or URL parameter
     difficulty = request.session.get('difficulty', 'Easy')  # Default to 'Easy' if not set
     return render(request, 'Sudoku/play.html', {"difficulty" : difficulty})
+
+@csrf_exempt
+@require_POST
+def set_difficulty(request):
+     try:
+        data = json.loads(request.body)  # Parse JSON data from the request
+        difficulty = data.get('difficulty')  # Get the difficulty level
+        if difficulty:
+            request.session['difficulty'] = difficulty  # Store it in session
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': 'No difficulty provided'})
+     except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 # def login_view(request):
 #     return render(request, 'Sudoku/login.html')

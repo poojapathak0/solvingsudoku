@@ -116,12 +116,34 @@
         {% endif %}
 
     <script>
-        function selectDifficulty(difficulty) {
-            // Store the difficulty in session storage
-            sessionStorage.setItem('difficulty', difficulty);
-            // Redirect to play page
-            window.location.href = "{% url 'play' %}";
+
+        function getCSRFToken() {
+            return document.cookie.split('; ').find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
         }
+
+
+        // Modify the selectDifficulty function in level.html
+        function selectDifficulty(difficulty) {
+            fetch('/set-difficulty/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()  // Get CSRF token from cookies
+                },
+                body: JSON.stringify({ difficulty: difficulty })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = /play/; 
+                } else {
+                    console.error("Error setting difficulty:", data.error);
+                }
+            })
+            .catch(error => console.error("Fetch error:", error));
+        }
+        
         
         document.addEventListener("DOMContentLoaded", function () {
             const difficulties = {
@@ -136,6 +158,12 @@
                 element.addEventListener("click", function () {
                     const difficultyText = element.querySelector('p').id;
                     const difficulty = difficultyText.split("-")[0];
+
+                     // Hardcoded URL
+                    const playUrl = "/play/";
+                    //set difficulty
+                    selectDifficulty(difficulty);
+
                     const clues = difficulties[difficulty];
                     
                     console.log(`Generating puzzle with ${clues} clues for ${difficulty} difficulty`);
@@ -164,7 +192,7 @@
                         sessionStorage.setItem('solutionBoard', JSON.stringify(data.solutionBoard));
                         
                         // Redirect to play page
-                        window.location.href = "/play/";
+                        window.location.href = playUrl;
                     })
                     .catch(error => {
                         console.error('Error generating puzzle:', error);
