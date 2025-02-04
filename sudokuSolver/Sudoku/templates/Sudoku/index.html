@@ -28,7 +28,7 @@
                
             </div>
             <div class="Play" id="playbutton">
-                <a href="{% if not user.is_authenticated %}{% url 'login' %}{% else %}{% url 'play' %}{% endif %}" 
+                <a href="{% if not user.is_authenticated %}{% url 'login' %}{% else %}{% url 'level' %}{% endif %}" 
                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">
                     <p>Play</p>
