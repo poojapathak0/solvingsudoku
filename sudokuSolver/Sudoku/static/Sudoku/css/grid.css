@@ -12,23 +12,97 @@ body {
   overflow-x: hidden;
 }
 
-/*display the selected difficulty level above the grid in the play page*/
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 80%;
+  width: 300px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.new-game-btn, .restart-btn {
+  color: rgb(229, 158, 44);
+  background: none;
+  border: 2px solid rgb(229, 158, 44);
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+}
+
+.new-game-btn:hover, .restart-btn:hover {
+  background-color: rgb(229, 158, 44);
+  color: white;
+}
+
+/* Add to your grid.css */
+.mistake-counter {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+  color: #666;
+  padding: 5px;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+  top: -18px;
+  
+}
+
+.mistake-counter.warning {
+  color: #dc2626;
+  animation: pulse 1s;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Adjust container spacing */
 .sudoku-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;  /* Centers it vertically if needed */
   width: 100%;
+  padding-top: 20px;
+  position: relative;
 }
 
 .difficulty-banner {
   width: 100%;
   background-color: #f2f2f2;
   padding: 10px 0;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   text-align: center;
 }
 
+/* Ensure grid positioning accounts for the counter */
+.sudoku-grid {
+  margin-top: 10px;
+}
 
 .difficulty-level {
   color: #e59e2c;
@@ -891,6 +965,3 @@ nav {
     right: 10px;
   }
 }
-
-
-

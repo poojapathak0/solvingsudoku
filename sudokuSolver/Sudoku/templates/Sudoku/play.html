@@ -49,6 +49,11 @@
                 function navigateToSolver() {  
                     window.location.href = "{% url 'solver' %}";  
                 }  
+
+                function navigateToLevel() {  
+                    window.location.href = "{% url 'level' %}";  
+                }  
+
             </script>
 
             </div>
@@ -186,6 +191,16 @@
     <div class="cell"></div>
     <div class="cell"></div>
     <div class="cell"></div>
+</div>
+<div id="gameOverModal" class="modal">
+    <div class="modal-content">
+        <h2>Game Over</h2>
+        <p>You lost the game because you made 3 mistakes</p>
+        <div class="button-group">
+            <button id="newGameBtn" class="new-game-btn" onclick="navigateToLevel()">New Game</button>
+            <button id="restartBtn" class="restart-btn">Restart</button>
+        </div>
+    </div>
 </div>
 <div class="buttons">
 <div class="rectangle1"> 
@@ -383,28 +398,32 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        initializeGrid();
-        initializeNumberButtons();
-        initializeGameControls();
+    initializeGrid();
+    initializeNumberButtons();
+    initializeGameControls();
     
-        // Load puzzle and solution from session storage
+    // Add mistake counter container to the DOM immediately after difficulty banner
+    const difficultyBanner = document.querySelector('.difficulty-banner');
+    let mistakeCounter = document.createElement('div');
+    mistakeCounter.className = 'mistake-counter';
+    mistakeCounter.textContent = 'Mistakes: 0 / 3';
+    difficultyBanner.after(mistakeCounter);
+    
+    // Load puzzle and solution from session storage
     const puzzleData = sessionStorage.getItem('sudokuPuzzle');
     const solutionData = sessionStorage.getItem('solutionBoard');
-    
-    console.log('Stored puzzle data:', puzzleData);
-    console.log('Stored solution data:', solutionData);
     
     try {
         if (puzzleData && solutionData) {
             const puzzle = JSON.parse(puzzleData);
-            solutionBoard = JSON.parse(solutionData); // Assign to global variable
+            solutionBoard = JSON.parse(solutionData);
             
             if (!Array.isArray(puzzle) || !Array.isArray(solutionBoard)) {
                 throw new Error('Invalid puzzle or solution data format');
             }
             
             renderPuzzle(puzzle);
-            gameBoard = puzzle.map(row => [...row]); // Deep copy puzzle to gameBoard
+            gameBoard = puzzle.map(row => [...row]);
         } else {
             throw new Error('Missing puzzle or solution data');
         }
@@ -414,7 +433,7 @@
         window.location.href = '/level/';
     }
 });
-                
+
 function renderPuzzle(puzzle) {
     console.log('Puzzle received:', puzzle); // Add this logging
     const cells = document.querySelectorAll('.cell');
@@ -438,77 +457,6 @@ function renderPuzzle(puzzle) {
 let mistakeCount = 0;
 const MAX_MISTAKES = 3;
 
-// Create game over modal HTML structure
-const gameOverModal = document.createElement('div');
-gameOverModal.innerHTML = `
-    <div id="gameOverModal" class="modal">
-        <div class="modal-content">
-            <h2>Game Over</h2>
-            <p>You lost the game because you made 3 mistakes</p>
-            <div class="button-group">
-                <button id="newGameBtn" class="new-game-btn" onclick="window.location.href='{% url 'level' %}'">New Game</button>
-                <button id="restartBtn" class="restart-btn">Restart</button>
-            </div>
-        </div>
-    </div>
-`;
-document.body.appendChild(gameOverModal);
-
-// Add styles for the modal
-const modalStyles = document.createElement('style');
-modalStyles.textContent = `
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        max-width: 80%;
-        width: 300px;
-    }
-
-    .button-group {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-    }
-
-    .new-game-btn, .restart-btn {
-        color: rgb(229, 158, 44);
-        background: none;
-        border: 2px solid rgb(229, 158, 44);
-        border-radius: 5px;
-        cursor: pointer;
-        padding: 8px 16px;
-        transition: all 0.3s ease;
-    }
-
-    .new-game-btn:hover, .restart-btn:hover {
-        background-color: rgb(229, 158, 44);
-        color: white;
-    }
-
-    .mistake-counter {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        font-size: 14px;
-        color: #666;
-    }
-`;
-document.head.appendChild(modalStyles);
 
 function enterNumber(num) {
     if (!selectedCell || selectedCell.classList.contains('pre-filled')) {
@@ -603,15 +551,37 @@ function enterNumber(num) {
     }
 }
 
+function initializeMistakeCounter() {
+    const container = document.querySelector('.sudoku-container');
+    const difficultyBanner = document.querySelector('.difficulty-banner');
+    
+    // Create mistake counter if it doesn't exist
+    let mistakeCounter = document.querySelector('.mistake-counter');
+    if (!mistakeCounter) {
+        mistakeCounter = document.createElement('div');
+        mistakeCounter.className = 'mistake-counter';
+        // Insert after difficulty banner
+        difficultyBanner.parentNode.insertBefore(mistakeCounter, difficultyBanner.nextSibling);
+    }
+    
+    // Set initial text
+    updateMistakeDisplay();
+}
+
+
 // Function to update mistake display
 function updateMistakeDisplay() {
-    const mistakeText = document.querySelector('.mistake-counter');
-    if (!mistakeText) {
-        const counter = document.createElement('div');
-        counter.className = 'mistake-counter';
-        document.body.appendChild(counter);
+    const mistakeCounter = document.querySelector('.mistake-counter');
+    if (mistakeCounter) {
+        mistakeCounter.textContent = `Mistakes: ${mistakeCount} / ${MAX_MISTAKES}`;
+        
+        // Add warning class when close to max mistakes
+        if (mistakeCount >= MAX_MISTAKES - 1) {
+            mistakeCounter.classList.add('warning');
+        } else {
+            mistakeCounter.classList.remove('warning');
+        }
     }
-    document.querySelector('.mistake-counter').textContent = `Mistakes: ${mistakeCount} / ${MAX_MISTAKES}`;
 }
 
 // Function to show game over modal
@@ -640,6 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure the modal is hidden initially
     const modal = document.getElementById('gameOverModal');
     modal.style.display = 'none';
+    initializeMistakeCounter(); 
 });
 
 
