@@ -105,8 +105,28 @@ body {
 }
 
 .difficulty-level {
-  color: #e59e2c;
   text-transform: capitalize;
+  font-weight: bold;  
+}  
+
+.beginner {  
+  color: #70ff40; 
+}  
+
+.easy {  
+  color: #29a300
+}  
+
+.medium {  
+  color: orange;  
+}  
+
+.hard {  
+  color: #ff5d5d 
+}  
+
+.extreme {  
+  color: rgb(209, 0, 0);
 }
 
 /* Sidebar Styles - Keeping original design */

@@ -94,11 +94,13 @@
         </div>
         {% endif %}
         <div class="sudoku-container">
-        <div class="difficulty-banner">
-            <div class="difficulty-container">
-                <h2><span class="difficulty-level">{{ difficulty }}</span></h2>
+            <div class="difficulty-banner">  
+                <div class="difficulty-container">  
+                    <h2>  
+                        <span class="difficulty-level {{ difficulty }}">{{ difficulty }}</span>  
+                    </h2>  
+                </div>  
             </div>
-        </div>
         <div>
 <div class="sudoku-grid">
     <!-- 81 grid cells for Sudoku -->

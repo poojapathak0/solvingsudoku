@@ -9,20 +9,21 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-  background-color: #fffcfc;
+  background-color: #f5f5f5;
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
 }
 
-/* Sidebar Styles - Matched with level.css */
+
+/* Sidebar Styles - Keeping original design */
 .sidebar {
   position: fixed;
   left: -250px;
   top: 0;
   width: 250px;
   height: 100vh;
-  background-color: #1a1a1a;
+  background-color: #1A1A1A;
   transition: left 0.3s ease-in-out;
   z-index: 1000;
   overflow: hidden;
@@ -41,7 +42,7 @@ nav {
   padding: 1rem 0;
 }
 
-/* Hamburger Button - Matched with level.css */
+/* Hamburger Button */
 .ham {
   position: fixed;
   left: 40px;
@@ -67,7 +68,7 @@ nav {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Navigation Elements - Matched with level.css */
+/* Navigation Elements */
 .top, .buttom {
   display: flex;
   flex-direction: column;
@@ -119,7 +120,6 @@ nav {
   width: clamp(25px, 3vw, 35px);
 }
 
-/* Hover effects - Matched with level.css */
 .Play:hover, .Solver:hover, .help:hover {
   background-color: rgba(255, 255, 255, 0.1);
   transform: translateX(5px);
@@ -179,294 +179,183 @@ nav {
 }
 
 
-
-.rectangle{
-  /* Sidebar */
-/* Rectangle 20 */
-
-box-sizing: border-box;
-
-position: absolute;
-width: 254px;
-height:80%;
-left: 78%;
-top: 3%;
-
-background: #fffefe;
-border: 2px solid #888686;
-box-shadow: 4px 6px 5.8px rgba(0, 0, 0, 0.25);
-border-radius: 20px;
-
-
-
-}
-
-.user{
-  /* Enter input : */
-
+      
+      .buttons {
+          position: fixed;
+          bottom: -9vh;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: clamp(10px, 1vw, 20px);
+          width: min(90%, 600px);
+          height: auto;
+      }
+      
+      .rectangle1, .rectangle2, .rectangle3, 
+      .rectangle4, .rectangle5, .rectangle6, 
+      .rectangle7, .rectangle8, .rectangle9 {
+          all: unset; /* Clear all styles for uniformity */
+          position: relative;
+          width: clamp(30px, 4vw, 50px);
+          aspect-ratio: 1 / 1.5;
+          border: 2px solid #888686;
+          box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), 
+                      -5px -5px 10px rgba(255, 255, 255, 0.5);
+          border-radius: 15px;
+          background: #fff;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          margin: 0;
+          padding: 0;
+      }
+      
+      .rectangle1:hover, .rectangle2:hover, .rectangle3:hover, 
+      .rectangle4:hover, .rectangle5:hover, .rectangle6:hover, 
+      .rectangle7:hover, .rectangle8:hover, .rectangle9:hover {
+          transform: translateY(-5px);
+          box-shadow: 7px 7px 15px rgba(0, 0, 0, 0.3), 
+                      -7px -7px 15px rgba(255, 255, 255, 0.7);
+          background: linear-gradient(145deg, #ffbe63, #ffd699);
+      }
+      /* Number Text Styling */
+#one, #two, #three, #four, #five,
+#six, #seven, #eight, #nine {
 position: absolute;
 width: 100%;
-height: 7%;
-left: 0%;
-top: 109%;
-border-radius:  20px 20px 20px 20px;
-border: 2px solid #888686;
-box-shadow: 4px 6px 5.8px rgba(0, 0, 0, 0.25);
-
-font-family: 'Changa';
-font-style: normal;
-font-weight: 400;
-font-size: 20px;
-line-height: 130%;
-
-color: #000000;
-z-index: 1;
-
+height: 100%;
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 0;
+font-size: clamp(1.2rem, 3vw, 2rem);
+color: #333;
+text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+.side-panel {
+  position: fixed;
+  right: -23vw;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 50%;
+  display:flex;
+  flex-direction: column;
+  gap: 2em;
 }
 
-.rectangle2{
 
-
-
-/* Rectangle 20 */
-
-box-sizing: border-box;
-
-position: absolute;
-width: 33.33%;
-height: 16%;
-left: -0.1em;
-top: -0.1em;
-
-background: #fffefe;
-border: 2px solid #888686;
-border-radius: 20px 0px 0px 0px;
-
-}
-
-.rectangle2>img{
-  /* Undo Circle */
-
-  position: absolute;
-  width: 70%;
-  height: 63.35px;
-  left: 13%;
-  top: 8%
-
-
- }
- .undo-text{
-  /* Undo */
-
-position: absolute;
-width: 36px;
-height: 26px;
-left:22px;
-top: 45px;
-
-font-family: 'Caveat Brush';
-font-style: normal;
-font-weight: 400;
-font-size: 20px;
-line-height: 130%;
-/* identical to box height, or 26px */
-
-color: #000000;
-
-
- }
- 
-
-.rectangle3{
-
-
-
-  /* Rectangle 20 */
-  
-  box-sizing: border-box;
-  
-  position: absolute;
-  width: 37%;
-  height: 16%;
-  left: 5em;
-  top: -0.1em;
-  
-  background: #fffefe;
+/* Option Rectangle */
+.orectangle {
+  width: 100%;
+  height: 100px;
+  background: #ffffff;
   border: 2px solid #888686;
-  border-radius: 0px 0px 0px 0px;
-  
-  
-  }
-  /* Icon */
-.rectangle3>img{
-/* eraser */
-
-position: absolute;
-width: 60%;
-height: 63.35px;
-left: 20%;
-top: 8%
-
-
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
-.eraser-text{
-  /* Erase */
-
-position: absolute;
-width: 38px;
-height: 26px;
-left: 27px;
-top: 45px;
-
-font-family: 'Caveat Brush';
-font-style: normal;
-font-weight: 400;
-font-size: 20px;
-line-height: 130%;
-/* identical to box height, or 26px */
-
-color: #000000;
-
-
+.orectangle:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-
-  .rectangle4{
-
-
-
-      /* Rectangle 20 */
-      
-      box-sizing: border-box;
-      
-      position: absolute;
-      width: 32.9%;
-      height: 16%;
-      left: 10.6em;
-      top: -0.1em;
-      
-      background: #fffefe;;
-      border: 2px solid #888686;
-      border-radius: 0px 20px 0px 0px;
-      
-      }
-     
-      .rectangle4>img{
-          /* clear */
-
-          position: absolute;
-          width: 65%;
-          height: 63.35px;
-          left: 15%;
-          top: 8%
-
-      }
-      .clear-text{
-          /* Clear all */
-
-position: absolute;
-width: 60px;
-height: 26px;
-left: calc(20% - 50px/2 + 19px);
-top: 45px;
-
-font-family: 'Caveat Brush';
-font-style: normal;
-font-weight: 400;
-font-size: 20px;
-line-height: 130%;
-/* identical to box height, or 26px */
-
-color: #000000;
-
-
-      }
-
-      .boxes{
-          
-              display: grid;
-              grid-template-columns: repeat(3, 1fr); /* 9 equal columns */
-              grid-template-rows: repeat(3, 1fr); /* 9 equal rows */
-          position: absolute;
-          width: 99%;
-          height: 28%;
-          left: 0.3%;
-          top: 33%;
-          z-index: 1;
-          border: 2px solid black;
-          text-align: center;
-          font-family: 'Changa';
-          font-style: normal;
-          font-weight: 10;
-          font-size: 40px;
-          line-height: 130%;
-          gap: 0.9%;
-          background-color: black; 
-      
-   div:nth-child(1),
-      div:nth-child(2),
-      div:nth-child(3) {
-background:   #F9AC30;
-      }
- 
-      div:nth-child(4),
-      div:nth-child(5),
-      div:nth-child(6) {
-background:  #F9AC30;
-      }
-         
-   div:nth-child(7),
-   div:nth-child(8),
-   div:nth-child(9) {
-background: #F9AC30;
-  }
+.option {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  padding: 0 15px;
 }
-.smallrectangle{
-  /* Rectangle 23 */
+
+#notes, #erase, #undo {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #444;
+}
+
+.option-img1, .option-img2, .option-img3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.option-img1 img, .option-img2 img, .option-img3 img {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  transition: all 0.3s ease;
+}
+.option-img1:hover img, .option-img2:hover img, .option-img3:hover img {
+  background: #FFE4B5;
+  transform: scale(1.1);
+}
+/* Score Rectangle */
+.rectangle {
+  width: 100%;
+  height: 325px;
+  padding: 25px;
+  background: #ffffff;
+  border: 2px solid #888686;
+  border-radius: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+#score, #timer {
+  font-size: clamp(1.5rem, 2.5vw, 3rem);
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+#score_val, #timer_val {
+  font-size: clamp(1.5rem, 2.5vw, 3rem);
+  margin: 0;
+}
+
+.smallrectangle {
+  box-sizing: border-box;
+  position: absolute;
+  width: 80%;
+  height: 63px;
+  left: 50%;
+  top:120%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  background: #F9AC30;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
  
- box-sizing: border-box;
- 
- position: absolute;
- width: 254px;
- height: 73px;
- left:78%;
- top: 75%;
- z-index: 1;
- 
- background:  #F9AC30;
- border: 4px solid #000000;
- box-shadow: 4px 6px 5.8px rgba(0, 0, 0, 0.25);
- border-radius: 0px 0px 20px 20px;
- 
- }
- #solve{
- /* Solve */
- 
- position: absolute;
- width: 108px;
- height: 59px;
- left: 35%;
- top: -66%;
- 
- font-family: 'Caveat Brush';
- font-style: normal;
- font-weight: 400;
- font-size: 48px;
- line-height: 60px;
- text-align: center;
- 
- color: #000000;
  
  
- }
+#solve {
+  color: #f0f0f0;
+  font-family: 'Caveat Brush';
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(1.8rem, 2.5vw, 2.2em);
+  text-align: center;
+  margin: 0;
+}
   .smallrectangle:hover {
-     transform: scale(1.1);
      transition: all .5s ease;
      border-radius:25px;
      cursor: pointer;
  }
  .smallrectangle{
-     transition: border-radius 0.6s ease; /* Transition when hovered out */
+     transition: border-radius 0.6s ease; 
  }
 
  
@@ -598,6 +487,7 @@ background: #F9AC30;
 }
 
 
+/* User Profile Styles */
 .user-profile {
   position: fixed;
   top: 20px;
@@ -619,6 +509,7 @@ background: #F9AC30;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Expanded state styles */
 .user-profile.expanded {
   border-radius: 12px;
   width: 200px;
@@ -659,6 +550,7 @@ background: #F9AC30;
   margin: 0;
 }
 
+/* Dropdown Content Styles */
 .profile-content {
   display: none;
   flex-direction: column;
@@ -728,28 +620,29 @@ background: #F9AC30;
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .user-profile {
-      top: 10px;
-      right: 20px;
-      padding: 0.4rem 0.8rem;
+    top: 10px;
+    right: 20px;
+    padding: 0.4rem 0.8rem;
   }
   
   .user-profile.expanded {
-      width: 180px;
+    width: 180px;
   }
   
   .profile-icon {
-      width: 30px;
-      height: 30px;
+    width: 30px;
+    height: 30px;
   }
   
   .username {
-      font-size: 1rem;
+    font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
   .user-profile {
-      top: 10px;
-      right: 10px;
+    top: 10px;
+    right: 10px;
   }
 }
+
