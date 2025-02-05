@@ -1,20 +1,17 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+
     font-family: "Caveat Brush", serif;
 }
 
-.sidebar {
-    position: fixed; /* Changed from absolute for consistent positioning */
-    left: 0; /* Ensure the sidebar is always aligned to the left */
+/* .sidebar {
+    left: 0; 
     top: 0;
     width: 250px;
     height: 100vh;
     background-color: #1a1a1a;
     transition: transform 0.3s ease-in-out;
     z-index: 1000;
-    overflow: auto; /* Allow scrolling if content overflows */
+    overflow: auto; 
 }
 
 nav {
@@ -25,18 +22,18 @@ nav {
     padding: 1rem 0;
 }
 
-/* Ensure nav is always visible */
+/* Ensure nav is always visible 
 .sidebar.open {
     transform: translateX(0);
 }
 
-/* Default state (hidden for toggling, if needed) */
+/* Default state (hidden for toggling, if needed) 
 .sidebar.closed {
     transform: translateX(-100%);
 }
-  /* Hamburger Button - Fixed position and hover */
+  /* Hamburger Button - Fixed position and hover 
   
-  /* Navigation Elements */
+  /* Navigation Elements 
   .top, .buttom {
     display: flex;
     flex-direction: column;
@@ -92,17 +89,17 @@ nav {
   .Play:hover, .Solver:hover, .help:hover {
     background-color: rgba(255, 255, 255, 0.1);
     transform: translateX(2px);
-  }
+  } */
 /* Main Screen Styles */
 .screen {
-    flex: 1;
-    margin-left: clamp(80px, 16vw, 250px);
-    height: 100vh;
+    height: 71vh;
     display: grid;
     place-items: center;
     position: relative;
     overflow: hidden;
-    padding: 2rem;
+    margin-top: 5%;
+    width: 97%;
+    padding: 0 20px; /* Add horizontal padding */
 }
 
 /* Decorative Elements */
@@ -128,31 +125,133 @@ nav {
     right: 25%;
     width: clamp(45px, 13vw, 180px);
 }
+.ps{
+   
+    gap:10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    margin-top:-5%;
+
+
+}
+
+.p{
+    color: #ffffff;
+    background-color: #000000;
+    width: 140%;
+    padding: 0.8rem;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    font-size: clamp(1.2rem, 2vw, 1.7rem);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    place-content: center;
+
+}
+
+.p:hover{
+    cursor: pointer;
+}
+
+.s{
+    color: #ffffff;
+    background-color: #000000;
+    width: 140%;
+    padding: 0.8rem;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    font-size: clamp(1.2rem, 2vw, 1.7rem);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    place-content: center;
+
+}
+.s:hover{
+    cursor: pointer;
+}
+.p, .s {
+    width: clamp(180px, 45vw, 250px); /* Make buttons responsive */
+    margin: 0 auto;
+}
+.h, .a {
+    width: clamp(40px, 8vw, 60px);
+}
+
+.ha{
+   
+    gap:5px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+}
+
+.h{
+    color: #ffffff;
+    background-color: #000000;
+    width: 4%;
+    padding: 0.8rem;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    font-size: clamp(1.1rem, 1.2vw, 1.5rem);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    place-content: center;
+
+}
+
+.h:hover{
+    cursor: pointer;
+}
+
+.a{
+    color: #ffffff;
+    background-color: #000000;
+    width: 4%;
+    padding: 0.8rem;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    font-size: clamp(1.1rem, 1.2vw, 1.5rem);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    place-content: center;
+}
+.a:hover{
+    cursor: pointer;
+}
 
 /* Text Styles */
 .screentext {
     text-align: center;
-    padding: 2rem;
+    padding: 0rem;
     z-index: 1;
+    left: 0px;
 }
 
 .maintext {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin-bottom: 1rem; 
 }
 
 .part1 {
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-size: clamp(2rem, 5vw, 4rem); /* Adjusted for better scaling */
 }
 
 .part2 {
-    font-size: clamp(3.5rem, 8vw, 6rem);
+    font-size: clamp(3rem, 7vw, 6rem); /* Adjusted for better scaling */
 }
 
 .subtext {
     color: grey;
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    font-size: clamp(0.8rem, 1.2vw, 1.2rem);
     margin-top: 1rem;
 }
 
@@ -314,27 +413,12 @@ nav {
 
 /* Media Queries */
 @media (max-width: 768px) {
-    nav {
-        min-width: 60px;
-    }
-    
-    .Play p, .Solver p, .help p {
-        display: none;
-    }
-    
-    .Play, .Solver, .help {
-        justify-content: center;
-    }
-    
     .screen {
         margin-left: 60px;
     }
 }
 
 @media (max-width: 480px) {
-    .cube, .puzzle, .joystick {
-        transform: scale(0.8);
-    }
     
     .screentext {
         padding: 1rem;
@@ -342,17 +426,7 @@ nav {
 }
 
 @media (max-width: 768px) {
-    nav {
-        min-width: 60px;
-    }
-    
-    .Play p, .Solver p, .help p {
-        display: none;
-    }
-    
-    .Play, .Solver, .help {
-        justify-content: center;
-    }
+   
     
     .screen {
         margin-left: 60px;
@@ -383,3 +457,181 @@ nav {
 .part2 {  
     animation-delay: 0.23s;  
 }  
+
+
+/* Large screens (above 1200px) */
+@media (min-width: 1201px) {
+    .ps {
+        margin-top: -5%;
+    }
+
+    .cube {
+        left: 15%;
+        width: clamp(80px, 12vw, 200px);
+    }
+
+    .joystick {
+        right: 15%;
+        width: clamp(80px, 12vw, 180px);
+    }
+}
+
+/* Medium screens (768px to 1200px) */
+@media (min-width: 768px) and (max-width: 1200px) {
+    .screen {
+        margin-top: 2%;
+    }
+
+    .ps {
+        margin-top: -2%;
+    }
+
+    .cube {
+        left: 10%;
+        width: clamp(60px, 10vw, 150px);
+    }
+
+    .joystick {
+        right: 10%;
+        width: clamp(60px, 10vw, 150px);
+    }
+
+    .ha {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* Small screens (480px to 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    .screen {
+        margin-top: 10%;
+        height: 70vh;
+    }
+
+    .ps {
+        margin-top: 5%;
+        margin-left: 0;
+    }
+
+    .cube {
+        top: 5%;
+        left: 5%;
+        width: clamp(40px, 8vw, 100px);
+    }
+
+    .joystick {
+        top: 5%;
+        right: 5%;
+        width: clamp(40px, 8vw, 100px);
+    }
+
+    .ha {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .h, .a {
+        width: clamp(35px, 7vw, 50px);
+    }
+}
+
+/* Extra small screens (below 480px) */
+@media (max-width: 480px) {
+    .screen {
+        margin-top: 15%;
+        height: 65vh;
+        margin-left: 0;
+    }
+
+    .screentext {
+        padding: 0.5rem;
+    }
+
+    .ps {
+        margin-top: 10%;
+        margin-left: 0;
+    }
+
+    .p, .s {
+        width: clamp(180px, 80vw, 250px);
+    }
+
+    .cube {
+        top: 5%;
+        left: 5%;
+        width: clamp(30px, 7vw, 80px);
+    }
+
+    .joystick {
+        top: 5%;
+        right: 5%;
+        width: clamp(30px, 7vw, 80px);
+    }
+
+    .ha {
+        position: fixed;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    .h, .a {
+        width: clamp(30px, 6vw, 45px);
+        font-size: clamp(0.8rem, 1vw, 1.2rem);
+    }
+
+    .user-profile {
+        top: 10px;
+        right: 10px;
+        padding: 0.3rem 0.6rem;
+    }
+}
+
+/* Portrait orientation specific adjustments */
+@media (orientation: portrait) {
+    .screen {
+        height: 70vh;
+    }
+
+    .ps {
+        margin-top: 0;
+    }
+}
+
+/* Landscape orientation specific adjustments */
+@media (orientation: landscape) and (max-height: 600px) {
+    .screen {
+        height: 85vh;
+        margin-top: 2%;
+    }
+
+    .ps {
+        margin-top: -8%;
+    }
+
+    .cube, .joystick {
+        top: 10%;
+    }
+}
+
+/* Fix for extremely small devices */
+@media (max-width: 320px) {
+    .screen {
+        height: 60vh;
+    }
+
+    .part1 {
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    .part2 {
+        font-size: clamp(2.5rem, 6vw, 4rem);
+    }
+
+    .p, .s {
+        width: clamp(150px, 70vw, 200px);
+        font-size: clamp(1rem, 1.5vw, 1.5rem);
+    }
+}

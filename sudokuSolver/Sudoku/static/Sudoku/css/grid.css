@@ -237,7 +237,6 @@ nav {
   top: 10%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .cell {
   background-color: #fff;
   display: flex;
@@ -247,22 +246,35 @@ nav {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.1s;
+  color: #ffad3a; /* Changed input text color to #ffad3a */
 }
 
-/* Cell Styles */
-.cell:focus {
-  outline: none;
-  background-color: #ffedc8;
+.cell.pre-filled {
+  color: #333; /* Keep original numbers in default color */
 }
 
+.cell.number-highlight {
+  background-color: #fff3e0; /* Light highlight for matching numbers */
+}
+
+.cell.selected.number-highlight {
+  background-color: #ffad3a; /* Stronger highlight for selected cell */
+  color: white;
+}
+
+/* Update the existing styles */
 .cell.selected {
   background-color: #ffad3a;
+  color: white;
 }
 
 .cell.highlighted {
   background-color: #fdd194;
 }
 
+.cell.wrong-entry {
+  color: #dc2626 !important; /* Keep error color visible */
+}
 /* 3x3 Box Borders */
 .cell:nth-child(3n) {
   border-right: 2px solid #888686;

@@ -16,7 +16,7 @@
 
 <body>
     {% csrf_token %}
-    <div class ="sidebar" id = "sidebar">
+    <!-- <div class ="sidebar" id = "sidebar">
     <nav>
         <div class="top">
 
@@ -35,7 +35,7 @@
                 </a>
             </div>
             
-            <!-- JavaScript (Optional if not using anchor tag) -->
+
            
            
             <div class="Play" id="solverbutton">
@@ -55,8 +55,8 @@
                 </div>
             </div>
     </nav>
-    </div>
-
+    </div> -->
+    
     <div class="screen">
         {% if user.is_authenticated %}
         <div class="user-profile" id="userProfile">
@@ -86,7 +86,7 @@
         </div>
         {% endif %}
         <div class="cube">
-            <img src="{% static 'Sudoku/images/cube.svg'%}" alt="" srcset="">
+            <img src="{% static 'Sudoku/images/sudoku.svg'%}" alt="" srcset="">
         </div>
         <div class="screentext">
             <div class="maintext">
@@ -95,12 +95,38 @@
             </div>
             <div class="subtext">PLAY, SOLVE, AND LEARN</div>
 
+
         </div>
         
+<div class="ps">
+    <a href="{% if not user.is_authenticated %}{% url 'login' %}{% else %}{% url 'level' %}{% endif %}" 
+    style="text-decoration: none; color: inherit;">
+    <div class="p">
+        
+       Play
+    </div>
+    </a>
+    <a href="{%url 'solver'%}" style="text-decoration: none; color: inherit;">
+    <div class="s">
+        Solve
+    </div>
+    </a>
+</div>
+
+
         <div class="joystick">
-            <img src="{% static 'Sudoku/images/joy.svg'%}" alt="">
+            <img src="{% static 'Sudoku/images/joypad.svg'%}" alt="">
         </div>
     </div>
+
+    <div class="ha">
+        <div class="h">
+            Help
+        </div>
+        <div class="a">
+        About
+        </div>
+    </div>  
     <script>
     const userProfile = document.getElementById('userProfile');
     if (userProfile) {
