@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Karla:ital,wght@0,200..800;1,200..800&display=swap"
         rel="stylesheet">
-        <style>
+    <style>
             .cell.row-highlight {
                 background-color:   #fdd194;
             }
@@ -44,6 +44,7 @@
 
 <body>
     {% csrf_token %}
+    {% csrf_token %}
     <div class="ham">
         <button id = "ham" class="ham"><img id="ham" src="{% static 'Sudoku/images/ham1.png' %}" alt="" srcset=""></button>
     </div>
@@ -56,12 +57,13 @@
                     <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
                 </div>
                 <div class="homeicon">
-                    <a href="{% url 'home' %}">
+                    <a href="{%url 'home'%}">
                     <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
-                </a>
+                    </a>
                 </div>
             </div>
-            <div class="Play" id="playbutton" onclick="navigateToPlay()">  
+
+            <div class="Play" id="playbutton">  
                 <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">  
                 <p>Play</p>  
             </div>  
@@ -71,21 +73,17 @@
                 <p>Solver</p>  
             </div>  
             
-            {% if user.is_authenticated %}
             <script>  
-            function navigateToPlay() {  
-                window.location.href = "{% url 'play' %}";
-            }
-            </script>
-            {% else %}
-            <script>  
-            function navigateToPlay() {  
-                    window.location.href = "{% url 'login' %}";
-            }
-            </script>
-            {% endif %}
 
-            
+                function navigateToSolver() {  
+                    window.location.href = "{% url 'solver' %}";  
+                }  
+
+                function navigateToLevel() {  
+                    window.location.href = "{% url 'level' %}";  
+                }  
+
+            </script>
 
             </div>
 
@@ -97,10 +95,8 @@
             </div>
     </nav>
 </div>
-
-
 {% if user.is_authenticated %}
-        <div class="user-profile" id="userProfile">
+        <div class="user-profile" id="userProfile"> 
             <div class="profile-header">
                 <div class="profile-icon">
                     <img src="{% static 'Sudoku/images/profile.jpg' %}" alt="Profile Icon">
@@ -120,541 +116,415 @@
                     <img src="{% static 'Sudoku/images/delete.png' %}" alt="Delete" width="16" height="16">
                     Delete Profile
                 </div>
-                <div class="logout" >
-                    <a href="{% url 'logout' %}" class="logout" style="text-decoration: none;">Logout</a>
+                <div class="logout" onclick="logoutUser()">
+                    Logout
                 </div>
             </div>
         </div>
-        {% endif %}   
-
-        <div class="sudoku-grid">
-            <!-- 81 grid cells for Sudoku -->
-            <script>
-                const gridContainer = document.querySelector('.sudoku-grid');
-        
-        // Clear existing content
-        gridContainer.innerHTML = '';
-        
-        // Create 81 cells (9x9 grid)
-        for (let i = 0; i < 81; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.setAttribute('tabindex', '0');
-        gridContainer.appendChild(cell);
-        }
-           </script>
-        
-           
-            
-            <div class="buttons">
-                <div class="rectangle1"> 
-                    <p id="one">1</p>
-                </div>
-                <div class="rectangle2">
-                <p id="two">2</p> 
-                 </div>
-                <div class="rectangle3"> 
-                    <p id="three">3</p> 
-                </div>
-                <div class="rectangle4">
-                    <p id="four">4</p> 
-                    </div>
-                <div class="rectangle5">
-                    <p id="five">5</p> 
-                 </div>
-                <div class="rectangle6">
-                    <p id="six">6</p> 
-                 </div>
-                <div class="rectangle7"> 
-                    <p id="seven">7</p> 
-                </div>
-                <div class="rectangle8">
-                    <p id="eight">8</p>
-                     </div>
-                <div class="rectangle9"> 
-                    <p id="nine">9</p>
-                </div>
-            </div>
-            <div class="side-panel">
-                <div class="orectangle">
-                    <div class="option">
-                        <div class="option-img1"> 
-                            <img src="{% static 'Sudoku/images/clear.svg' %}" alt="">
-                            <p id = "notes">Clear all</p>
-                        </div>
-                        <div class="option-img2">
-                            <img src="{% static 'Sudoku/images/undo.svg' %}" alt="">
-                            <p id = "undo">Undo</p>
-                        </div>
-                        <div class="option-img3">
-                            <img src="{% static 'Sudoku/images/erase.svg' %}" alt="">
-                            <p id = "erase">Erase</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="dialouge">
-                    <div class="rectangle">
-                        <p id="score">Score:</p>
-                        <p id ="score_val"> 0</p>
-                        <p id="timer">Timer:</p>
-                        <p id="timer_val"> 00:00</p>
-                        <div class="smallrectangle">
-                            <p id="solve">Solve</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    const cells = document.querySelectorAll('.cell');
-                    const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
-                    const eraseBtn = document.querySelector('.option-img3');
-                    const undoBtn = document.querySelector('.option-img2');
-            
-                    let selectedCell = null;
-                    let gameHistory = [];
-                    let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
-            
-                    // Validation Function
-                    function validateCell(row, col, number) {
-                        // Check row
-                        for (let i = 0; i < 9; i++) {
-                            if (i !== col && gameBoard[row][i] === number) return false;
-                        }
-                        
-                        // Check column
-                        for (let i = 0; i < 9; i++) {
-                            if (i !== row && gameBoard[i][col] === number) return false;
-                        }
-                        
-                        // Check 3x3 box
-                        const boxRow = Math.floor(row / 3) * 3;
-                        const boxCol = Math.floor(col / 3) * 3;
-                        for (let i = 0; i < 3; i++) {
-                            for (let j = 0; j < 3; j++) {
-                                const currentRow = boxRow + i;
-                                const currentCol = boxCol + j;
-                                if ((currentRow !== row || currentCol !== col) && 
-                                    gameBoard[currentRow][currentCol] === number) {
-                                    return false;
-                                }
-                            }
-                        }
-                        
-                        return true;
-                    }
-            
-                    // Highlight related cells
-                    function highlightRelatedCells(cell) {
-                        // Remove all previous highlights
-                        cells.forEach(c => {
-                            c.classList.remove('highlighted', 'selected', 'row-highlight', 'column-highlight');
-                        });
-            
-                        // Get cell index and row/column
-                        const cellIndex = Array.from(cells).indexOf(cell);
-                        const row = Math.floor(cellIndex / 9);
-                        const col = cellIndex % 9;
-                        const boxStartRow = Math.floor(row / 3) * 3;
-                        const boxStartCol = Math.floor(col / 3) * 3;
-            
-                        // Highlight entire row
-                        cells.forEach((c, i) => {
-                            const currentRow = Math.floor(i / 9);
-                            const currentCol = i % 9;
-            
-                            if (currentRow === row) {
-                                c.classList.add('row-highlight');
-                            }
-            
-                            // Highlight entire column
-                            if (currentCol === col) {
-                                c.classList.add('column-highlight');
-                            }
-            
-                            // Highlight 3x3 box
-                            if (currentRow >= boxStartRow && currentRow < boxStartRow + 3 &&
-                                currentCol >= boxStartCol && currentCol < boxStartCol + 3) {
-                                c.classList.add('highlighted');
-                            }
-                        });
-            
-                        // Highlight the selected cell
-                        cell.classList.add('selected');
-                    }
-            
-                    // History Recording
-                    function recordHistory(cell, previousValue) {
-                        const cellIndex = Array.from(cells).indexOf(cell);
-                        const row = Math.floor(cellIndex / 9);
-                        const col = cellIndex % 9;
-            
-                        gameHistory.push({
-                            element: cell,
-                            value: previousValue,
-                            row: row,
-                            col: col
-                        });
-            
-                        // Limit history to last 10 actions
-                        if (gameHistory.length > 10) {
-                            gameHistory.shift();
-                        }
-                    }
-            
-                    // Cell Selection
-                    cells.forEach((cell) => {
-                        cell.addEventListener('click', () => {
-                            selectedCell = cell;
-                            highlightRelatedCells(cell);
-                        });
-            
-                        // Keyboard input handling
-                        cell.addEventListener('keydown', (e) => {
-                            // Number input
-                            if (e.key >= '1' && e.key <= '9') {
-                                const number = parseInt(e.key);
-                                const cellIndex = Array.from(cells).indexOf(cell);
-                                const row = Math.floor(cellIndex / 9);
-                                const col = cellIndex % 9;
-                                
-                                // Record previous state for undo
-                                recordHistory(cell, gameBoard[row][col]);
-                                
-                                // Validate and enter the number
-                                if (validateCell(row, col, number)) {
-                                    cell.textContent = number;
-                                    gameBoard[row][col] = number;
-                                    cell.classList.remove('invalid');
-                                    highlightRelatedCells(cell);
-                                } else {
-                                    cell.classList.add('invalid');
-                                    cell.style.animation = 'shake 0.5s';
-                                    setTimeout(() => {
-                                        cell.style.animation = '';
-                                    }, 500);
-                                }
-                            }
-                            
-                            // Backspace/Delete to clear
-                            if (e.key === 'Backspace' || e.key === 'Delete') {
-                                const cellIndex = Array.from(cells).indexOf(cell);
-                                const row = Math.floor(cellIndex / 9);
-                                const col = cellIndex % 9;
-                                
-                                recordHistory(cell, gameBoard[row][col]);
-                                cell.textContent = '';
-                                gameBoard[row][col] = 0;
-                                cell.classList.remove('invalid');
-                            }
-                        });
-                    });
-            
-                    // Remove highlights and errors when clicking outside
-                    document.addEventListener('click', (event) => {
-                        const sudokuGrid = document.querySelector('.sudoku-grid');
-                        const numberButtons = document.querySelector('.buttons');
-                        
-                        if (!sudokuGrid.contains(event.target) && !numberButtons.contains(event.target)) {
-                            cells.forEach(cell => {
-                                cell.classList.remove('highlighted', 'selected', 'row-highlight', 'column-highlight');
-                                
-                                // Remove invalid class after 3 seconds
-                                if (cell.classList.contains('invalid')) {
-                                    setTimeout(() => {
-                                        cell.classList.remove('invalid');
-                                    }, 3000);
-                                }
-                            });
-                            
-                            selectedCell = null;
-                        }
-                    });
-            
-                    // Number Input from Buttons
-                    numberButtons.forEach(button => {
-                        button.addEventListener('click', () => {
-                            if (selectedCell) {
-                                const number = parseInt(button.querySelector('p').textContent);
-                                const cellIndex = Array.from(cells).indexOf(selectedCell);
-                                const row = Math.floor(cellIndex / 9);
-                                const col = cellIndex % 9;
-                                
-                                // Record previous state for undo
-                                recordHistory(selectedCell, gameBoard[row][col]);
-                                
-                                // Validate and enter the number
-                                if (validateCell(row, col, number)) {
-                                    selectedCell.textContent = number;
-                                    gameBoard[row][col] = number;
-                                    selectedCell.classList.remove('invalid');
-                                    highlightRelatedCells(selectedCell);
-                                } else {
-                                    selectedCell.classList.add('invalid');
-                                    selectedCell.style.animation = 'shake 0.5s';
-                                    setTimeout(() => {
-                                        selectedCell.style.animation = '';
-                                    }, 500);
-                                }
-                            }
-                        });
-                    });
-            
-                    // Erase Functionality
-                    if (eraseBtn) {
-                        eraseBtn.addEventListener('click', () => {
-                            if (selectedCell && selectedCell.textContent.trim() !== '') {
-                                const cellIndex = Array.from(cells).indexOf(selectedCell);
-                                const row = Math.floor(cellIndex / 9);
-                                const col = cellIndex % 9;
-                                
-                                // Record current state before erasing
-                                recordHistory(selectedCell, gameBoard[row][col]);
-                                
-                                // Clear cell
-                                selectedCell.textContent = '';
-                                gameBoard[row][col] = 0;
-                                selectedCell.classList.remove('invalid');
-                            }
-                        });
-                    }
-            
-                    // Undo Functionality
-                    if (undoBtn) {
-                        undoBtn.addEventListener('click', () => {
-                            if (gameHistory.length > 0) {
-                                const lastState = gameHistory.pop();
-                                if (lastState.element) {
-                                    // Restore the previous state
-                                    lastState.element.textContent = lastState.value !== 0 ? lastState.value : '';
-                                    gameBoard[lastState.row][lastState.col] = lastState.value;
-                                    
-                                    // Remove invalid class if restoring a valid number
-                                    lastState.element.classList.remove('invalid');
-                                }
-                            }
-                        });
-                    }
-            
-                    // Hamburger menu toggle
-                    const hamburger = document.getElementById('ham');  
-                    const sidebar = document.getElementById('sidebar');  
-            
-                    hamburger.addEventListener('click', () => {  
-                        sidebar.classList.toggle('active');
-                    });  
-                    
-                    document.addEventListener('click', (event) => {  
-                        const isClickInside = sidebar.contains(event.target) || hamburger.contains(event.target);  
-                        if (!isClickInside) {  
-                            sidebar.classList.remove('active');
-                        }  
-                    });
-                });
-
-          
-        const userProfile = document.getElementById('userProfile');
-        if (userProfile) {
-            userProfile.classList.add('authenticated');
-            
-            userProfile.addEventListener('click', (event) => {
-                event.stopPropagation();
-                userProfile.classList.toggle('expanded');
-            });
-    
-            document.addEventListener('click', (event) => {
-                if (!userProfile.contains(event.target)) {
-                    userProfile.classList.remove('expanded');
-                }
-            });
-        }
-    
-        // Change username function
-        function changeUsername() {
-        const newUsername = prompt('Enter new username:');
-        if (newUsername && newUsername.trim() !== '') {
-            fetch('/change-username/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({username: newUsername.trim()})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update username in the UI immediately
-                    document.querySelector('.username').textContent = newUsername.trim();
-                    // Optional: Show success message
-                    alert('Username successfully changed!');
-                } else {
-                    // Show error message
-                    alert(data.error || 'Failed to change username');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while changing username');
-            });
-        }
-    }
-    // Helper function to get CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    
-        // Delete profile function
-        function deleteProfile() {
-        if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-            // Get CSRF token
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            
-            fetch('/delete-profile/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Redirect to home page after successful deletion
-                    window.location.href = '/';
-                } else {
-                    alert('Failed to delete profile. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while deleting the profile.');
-            });
-        }
-    }
-
-
+        {% endif %}
 
    
+        <div class="sudoku-grid">
+            <!-- 81 grid cells for Sudoku -->
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+   
 
-    // Clear solver grid
-    function clearSolverGrid() {
-        const cells = document.querySelectorAll('.sudoku-grid .cell');
-        cells.forEach(cell => {
-            cell.textContent = '';
-            cell.classList.remove('solved');
-        });
-        solverBoard = Array(9).fill().map(() => Array(9).fill(0));
-    }
-
-
-
+    <div class="buttons">
+        <div class="rectangle1"> 
+            <p id="one">1</p>
+        </div>
+        <div class="rectangle2">
+        <p id="two">2</p> 
+            </div>
+        <div class="rectangle3"> 
+            <p id="three">3</p> 
+        </div>
+        <div class="rectangle4">
+            <p id="four">4</p> 
+            </div>
+        <div class="rectangle5">
+            <p id="five">5</p> 
+            </div>
+        <div class="rectangle6">
+            <p id="six">6</p> 
+            </div>
+        <div class="rectangle7"> 
+            <p id="seven">7</p> 
+        </div>
+        <div class="rectangle8">
+            <p id="eight">8</p>
+                </div>
+        <div class="rectangle9"> 
+            <p id="nine">9</p>
+        </div>
+            
+            
+<div class="side-panel">
+    <div class="orectangle">
+        <div class="option">
+            <div class="option-img1"> 
+                <img src="{% static 'Sudoku/images/clear.svg' %}" alt="undo">
+                <p id = "notes">Clear All</p>
+            </div>
+            <div class="option-img2">
+                <img src="{% static 'Sudoku/images/undo.svg' %}" alt="undo">
+                <p id = "undo">Undo</p>
+            </div>
+            <div class="option-img3">
+                <img src="{% static 'Sudoku/images/erase.svg' %}" alt="undo">
+                <p id = "erase">Erase</p>
+            </div>
+        </div>
+    </div>
+    <div class="dialouge">
+        <div class="rectangle">
+            <p id="score">Score:</p>
+            <p id ="score_val"> 0</p>
+            <p id="timer">Timer:</p>
+            <p id="timer_val"> 00:00</p>
+            <div class="smallrectangle">
+                <p id="solve">Solve</p>
+            </div>
+        </div>
+    </div>
+    </div>
+            
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cells = document.querySelectorAll('.cell');
+            const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
+            const eraseBtn = document.querySelector('.option-img3');
+            const undoBtn = document.querySelector('.option-img2');
     
-//backend for solver salina
-    // Initialize solver-specific event listeners
-    document.addEventListener('DOMContentLoaded', () => {
-        initializeSolverGrid();
-
-        // Add solve button listener
-        const solveButton = document.getElementById('solve');
-        if (solveButton) {
-            solveButton.addEventListener('click', solve_Sudoku);
-        }
-
-        // Add clear button listener
-        const clearButton = document.querySelector('.rectangle4');
-        if (clearButton) {
-            clearButton.addEventListener('click', clearSolverGrid);
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Ensure the Solve button exists and attach the event listener
-        const solveButton = document.getElementById('solve');
-        if (solveButton) {
-            solveButton.addEventListener('click', solveSudoku);
-        } else {
-            console.error("Solve button not found in the DOM.");
-        }
-    });
+            let selectedCell = null;
+            let gameHistory = [];
+            let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
     
-    // Function to handle solving the Sudoku
-    function solveSudoku() {
-        console.log("Solve button clicked!");
+            // Validation Function
+            function validateCell(row, col, number) {
+                // Check row
+                for (let i = 0; i < 9; i++) {
+                    if (i !== col && gameBoard[row][i] === number) return false;
+                }
+                
+                // Check column
+                for (let i = 0; i < 9; i++) {
+                    if (i !== row && gameBoard[i][col] === number) return false;
+                }
+                
+                // Check 3x3 box
+                const boxRow = Math.floor(row / 3) * 3;
+                const boxCol = Math.floor(col / 3) * 3;
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        const currentRow = boxRow + i;
+                        const currentCol = boxCol + j;
+                        if ((currentRow !== row || currentCol !== col) && 
+                            gameBoard[currentRow][currentCol] === number) {
+                            return false;
+                        }
+                    }
+                }
+                
+                return true;
+            }
     
-        const cells = document.querySelectorAll('.sudoku-grid .cell');
-        const formData = new FormData();
+            // Highlight related cells
+            function highlightRelatedCells(cell) {
+                // Remove all previous highlights
+                cells.forEach(c => {
+                    c.classList.remove('highlighted', 'selected', 'row-highlight', 'column-highlight');
+                });
     
-        // Collect grid data from the cells
-        for (let row = 0; row < 9; row++) {
-            for (let col = 0; col < 9; col++) {
-                const index = row * 9 + col;
-                const value = cells[index].textContent.trim();
+                // Get cell index and row/column
+                const cellIndex = Array.from(cells).indexOf(cell);
+                const row = Math.floor(cellIndex / 9);
+                const col = cellIndex % 9;
+                const boxStartRow = Math.floor(row / 3) * 3;
+                const boxStartCol = Math.floor(col / 3) * 3;
     
-                if (value && /^[1-9]$/.test(value)) {
-                    formData.append(`cell_${row}_${col}`, value);
+                // Highlight entire row
+                cells.forEach((c, i) => {
+                    const currentRow = Math.floor(i / 9);
+                    const currentCol = i % 9;
+    
+                    if (currentRow === row) {
+                        c.classList.add('row-highlight');
+                    }
+    
+                    // Highlight entire column
+                    if (currentCol === col) {
+                        c.classList.add('column-highlight');
+                    }
+    
+                    // Highlight 3x3 box
+                    if (currentRow >= boxStartRow && currentRow < boxStartRow + 3 &&
+                        currentCol >= boxStartCol && currentCol < boxStartCol + 3) {
+                        c.classList.add('highlighted');
+                    }
+                });
+    
+                // Highlight the selected cell
+                cell.classList.add('selected');
+            }
+    
+            // History Recording
+            function recordHistory(cell, previousValue) {
+                const cellIndex = Array.from(cells).indexOf(cell);
+                const row = Math.floor(cellIndex / 9);
+                const col = cellIndex % 9;
+    
+                gameHistory.push({
+                    element: cell,
+                    value: previousValue,
+                    row: row,
+                    col: col
+                });
+    
+                // Limit history to last 10 actions
+                if (gameHistory.length > 10) {
+                    gameHistory.shift();
                 }
             }
-        }
     
-        // Retrieve CSRF token for the request
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            // Cell Selection
+            cells.forEach((cell) => {
+                cell.addEventListener('click', () => {
+                    selectedCell = cell;
+                    highlightRelatedCells(cell);
+                });
     
-        // Send the grid data to the backend
-        fetch('/solve-sudoku/', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': csrftoken,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                if (data.solved) {
-                    console.log("Sudoku solved successfully:", data.solution);
-                    updateGrid(data.solution);
-                } else {
-                    alert(data.error || "Failed to solve the Sudoku.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error during solve request:", error);
-                alert("An error occurred while solving the Sudoku.");
+                // Keyboard input handling
+                cell.addEventListener('keydown', (e) => {
+                    // Number input
+                    if (e.key >= '1' && e.key <= '9') {
+                        const number = parseInt(e.key);
+                        const cellIndex = Array.from(cells).indexOf(cell);
+                        const row = Math.floor(cellIndex / 9);
+                        const col = cellIndex % 9;
+                        
+                        // Record previous state for undo
+                        recordHistory(cell, gameBoard[row][col]);
+                        
+                        // Validate and enter the number
+                        if (validateCell(row, col, number)) {
+                            cell.textContent = number;
+                            gameBoard[row][col] = number;
+                            cell.classList.remove('invalid');
+                            highlightRelatedCells(cell);
+                        } else {
+                            cell.classList.add('invalid');
+                            cell.style.animation = 'shake 0.5s';
+                            setTimeout(() => {
+                                cell.style.animation = '';
+                            }, 500);
+                        }
+                    }
+                    
+                    // Backspace/Delete to clear
+                    if (e.key === 'Backspace' || e.key === 'Delete') {
+                        const cellIndex = Array.from(cells).indexOf(cell);
+                        const row = Math.floor(cellIndex / 9);
+                        const col = cellIndex % 9;
+                        
+                        recordHistory(cell, gameBoard[row][col]);
+                        cell.textContent = '';
+                        gameBoard[row][col] = 0;
+                        cell.classList.remove('invalid');
+                    }
+                });
             });
-    }
     
-    // Function to update the grid with the solution
-    function updateGrid(solution) {
-        const cells = document.querySelectorAll('.sudoku-grid .cell');
-        for (let row = 0; row < 9; row++) {
-            for (let col = 0; col < 9; col++) {
-                const index = row * 9 + col;
-                cells[index].textContent = solution[row][col] || '';
-                cells[index].classList.add('solved'); // Optional styling
+            // Remove highlights and errors when clicking outside
+            document.addEventListener('click', (event) => {
+                const sudokuGrid = document.querySelector('.sudoku-grid');
+                const numberButtons = document.querySelector('.buttons');
+                
+                if (!sudokuGrid.contains(event.target) && !numberButtons.contains(event.target)) {
+                    cells.forEach(cell => {
+                        cell.classList.remove('highlighted', 'selected', 'row-highlight', 'column-highlight');
+                        
+                        // Remove invalid class after 3 seconds
+                        if (cell.classList.contains('invalid')) {
+                            setTimeout(() => {
+                                cell.classList.remove('invalid');
+                            }, 3000);
+                        }
+                    });
+                    
+                    selectedCell = null;
+                }
+            });
+    
+            // Number Input from Buttons
+            numberButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if (selectedCell) {
+                        const number = parseInt(button.querySelector('p').textContent);
+                        const cellIndex = Array.from(cells).indexOf(selectedCell);
+                        const row = Math.floor(cellIndex / 9);
+                        const col = cellIndex % 9;
+                        
+                        // Record previous state for undo
+                        recordHistory(selectedCell, gameBoard[row][col]);
+                        
+                        // Validate and enter the number
+                        if (validateCell(row, col, number)) {
+                            selectedCell.textContent = number;
+                            gameBoard[row][col] = number;
+                            selectedCell.classList.remove('invalid');
+                            highlightRelatedCells(selectedCell);
+                        } else {
+                            selectedCell.classList.add('invalid');
+                            selectedCell.style.animation = 'shake 0.5s';
+                            setTimeout(() => {
+                                selectedCell.style.animation = '';
+                            }, 500);
+                        }
+                    }
+                });
+            });
+    
+            // Erase Functionality
+            if (eraseBtn) {
+                eraseBtn.addEventListener('click', () => {
+                    if (selectedCell && selectedCell.textContent.trim() !== '') {
+                        const cellIndex = Array.from(cells).indexOf(selectedCell);
+                        const row = Math.floor(cellIndex / 9);
+                        const col = cellIndex % 9;
+                        
+                        // Record current state before erasing
+                        recordHistory(selectedCell, gameBoard[row][col]);
+                        
+                        // Clear cell
+                        selectedCell.textContent = '';
+                        gameBoard[row][col] = 0;
+                        selectedCell.classList.remove('invalid');
+                    }
+                });
             }
-        }
-    }
     
-    </script>
-
-</body>
-
-</html>
-
-
+            // Undo Functionality
+            if (undoBtn) {
+                undoBtn.addEventListener('click', () => {
+                    if (gameHistory.length > 0) {
+                        const lastState = gameHistory.pop();
+                        if (lastState.element) {
+                            // Restore the previous state
+                            lastState.element.textContent = lastState.value !== 0 ? lastState.value : '';
+                            gameBoard[lastState.row][lastState.col] = lastState.value;
+                            
+                            // Remove invalid class if restoring a valid number
+                            lastState.element.classList.remove('invalid');
+                        }
+                    }
+                });
+            }
+    
+            // Hamburger menu toggle
+            const hamburger = document.getElementById('ham');  
+            const sidebar = document.getElementById('sidebar');  
+    
+            hamburger.addEventListener('click', () => {  
+                sidebar.classList.toggle('active');
+            });  
+            
+            document.addEventListener('click', (event) => {  
+                const isClickInside = sidebar.contains(event.target) || hamburger.contains(event.target);  
+                if (!isClickInside) {  
+                    sidebar.classList.remove('active');
+                }  
+            });
+        });
+        </script>
+    </body>
+    </html>
