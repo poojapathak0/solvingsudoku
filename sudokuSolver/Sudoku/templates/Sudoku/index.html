@@ -119,14 +119,249 @@
         </div>
     </div>
 
-    <div class="ha">
-        <div class="h">
-            Help
+    <!-- Replace the existing help and about sections with this -->
+<div class="info-section">
+    <div class="help" id="helpButton">
+        
+        <span>❓<br>Help</span>
+    </div>
+    <div class="about" id="aboutButton">
+
+        <span>!<br>About</span>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal" id="helpModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Sudoku Help</h2>
+            <button class="close-btn" id="closeHelpModal">&times;</button>
         </div>
-        <div class="a">
-        About
+        <div class="modal-body">
+            <div class="help-tip">
+                <h3>Sudoku Tips</h3>
+                <ul>
+                    <li>Each row, column, and 3×3 box must contain numbers 1-9 without repeats</li>
+                    <li>Start with the most filled rows or columns</li>
+                    <li>Use pencil marks to track possible numbers</li>
+                    <li>Look for 'naked singles' (cells with only one possible number)</li>
+                    <li>If stuck, take a step back and re-evaluate</li>
+                </ul>
+            </div>
+            <div class="help-strategies">
+                <h3>Solving Strategies</h3>
+                <details>
+                    <summary>Elimination Technique</summary>
+                    <p>Remove numbers that can't go in a cell based on existing numbers in the row, column, and box.</p>
+                </details>
+                <details>
+                    <summary>Pencil Marking</summary>
+                    <p>Systematically mark possible numbers in each empty cell to narrow down solutions.</p>
+                </details>
+            </div>
         </div>
-    </div>  
+    </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal" id="aboutModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>About Sudoku</h2>
+            <button class="close-btn" id="closeAboutModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="about-content">
+                <p>Sudoku is a logic-based number-placement puzzle that challenges your problem-solving skills.</p>
+                <h3>Game Rules</h3>
+                <ul>
+                    <li>Fill a 9×9 grid with digits</li>
+                    <li>Each column must contain numbers 1-9 without repetition</li>
+                    <li>Each row must contain numbers 1-9 without repetition</li>
+                    <li>Each of the nine 3×3 sub-boxes must contain numbers 1-9 without repetition</li>
+                </ul>
+                <p>Challenge yourself and improve your logical thinking!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+   /* Position buttons at the bottom-left */
+.info-section {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+}
+
+/* Common button styles */
+.help, .about {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2c2f36, #3a3f47);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid #00ADB5;
+    text-align: center;
+}
+
+/* Smooth hover effects */
+.help:hover, .about:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 173, 181, 0.5);
+    border-color: #EEEEEE;
+}
+
+/* Help button styling */
+.help {
+    background: linear-gradient(135deg, #ff8c00, #ffbb33);
+}
+.help::before {
+    
+    font-size: 1.5rem;
+}
+
+/* About button styling */
+.about {
+    background: linear-gradient(135deg, #007bff, #00d4ff);
+}
+.about::before {
+   
+    font-size: 1.5rem;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-family: 'Karla', sans-serif;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.modal-body {
+    padding: 1rem;
+    line-height: 1.6;
+}
+
+details {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+details summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+details[open] {
+    background-color: #f0f0f0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const helpButton = document.getElementById('helpButton');
+    const aboutButton = document.getElementById('aboutButton');
+    const helpModal = document.getElementById('helpModal');
+    const aboutModal = document.getElementById('aboutModal');
+    const closeHelpModal = document.getElementById('closeHelpModal');
+    const closeAboutModal = document.getElementById('closeAboutModal');
+
+    function openModal(modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+
+    function closeModal(modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    helpButton.addEventListener('click', () => openModal(helpModal));
+    aboutButton.addEventListener('click', () => openModal(aboutModal));
+    
+    closeHelpModal.addEventListener('click', () => closeModal(helpModal));
+    closeAboutModal.addEventListener('click', () => closeModal(aboutModal));
+
+    // Close modal when clicking outside
+    [helpModal, aboutModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(modal);
+            }
+        });
+    });
+});
+</script>
     <script>
     const userProfile = document.getElementById('userProfile');
     if (userProfile) {
