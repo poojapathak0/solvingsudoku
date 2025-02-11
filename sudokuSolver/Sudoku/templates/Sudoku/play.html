@@ -274,7 +274,9 @@
     let solutionBoard = null;
     let gameHistory = []; // Initialize game history array
     const cells = document.querySelectorAll('.cell');
-
+// Global variables for pencil mode
+let isPencilMode = false;
+let pencilMarks = Array(81).fill().map(() => new Set());
      // Initialize the grid
     // Initialize game controls
     function initializeGameControls() {
@@ -305,7 +307,15 @@
             notesBtn.addEventListener('click', handleNotes);
         }
     }
-
+// Function to toggle pencil mode
+function togglePencilMode() {
+    isPencilMode = !isPencilMode;
+    const notesButton = document.querySelector('.option-img1');
+    if (notesButton) {
+        notesButton.classList.toggle('active', isPencilMode);
+        notesButton.style.backgroundColor = isPencilMode ? '#FFE4B5' : '';
+    }
+}
     function recordHistory(cell) {
         if (!cell) return;
         
@@ -468,90 +478,172 @@ function enterNumber(num) {
     const row = Math.floor(index / 9);
     const col = index % 9;
 
-    if (!solutionBoard?.[row]?.[col]) {
-        return;
+    if (isPencilMode) {
+        handlePencilMode(num);
+    } else {
+        handleNormalMode(num, row, col, cells);
+    }
+}
+
+function handlePencilMode(num) {
+    let pencilMarksContainer = selectedCell.querySelector('.pencil-mark');
+    if (!pencilMarksContainer) {
+        pencilMarksContainer = document.createElement('div');
+        pencilMarksContainer.className = 'pencil-mark';
+        selectedCell.appendChild(pencilMarksContainer);
+        
+        pencilMarksContainer.style.cssText = `
+        font-size: xx-small !important;
+        font-style: italic !important;
+        color: grey !important;
+       font-family: "Times New Roman", serif !important;
+       font-size: 2px !important;
+         pencilMarksContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';  // 3 columns per row
+       grid-template-columns: repeat(3, 1fr) !important; 
+         pencilMarksContainer.style.textAlign = 'center';
+    `;
+
+    }
+   
+    const currentMarks = pencilMarksContainer.textContent.split(' ').filter(Boolean);
+    const numStr = num.toString();
+    
+    if (currentMarks.includes(numStr)) {
+        // Remove number if it exists
+        pencilMarksContainer.textContent = currentMarks
+            .filter(mark => mark !== numStr)
+            .sort((a, b) => a - b)  // Keep marks sorted
+            .join(' ');
+    } else {
+        // Add number if it doesn't exist
+        currentMarks.push(numStr);
+        pencilMarksContainer.textContent = currentMarks
+            .sort((a, b) => a - b)  // Keep marks sorted
+            .join(' ');
     }
 
-    // Record the current state before making the change
+    // Optimize layout based on number of marks
+    const markCount = pencilMarksContainer.textContent.split(' ').filter(Boolean).length;
+    pencilMarksContainer.style.fontSize = markCount > 3 ? '0.6em' : '0.6em';
+    
+}
+
+function handleNormalMode(num, row, col, cells) {
     recordHistory(selectedCell);
 
-    // Clear previous error highlights
-    cells.forEach(cell => {
-        if (cell.classList.contains('wrong-entry')) {
-            cell.textContent = '';
-            const cellIndex = [...cells].indexOf(cell);
-            const cellRow = Math.floor(cellIndex / 9);
-            const cellCol = cellIndex % 9;
-            gameBoard[cellRow][cellCol] = 0;
-        }
-        cell.classList.remove('wrong-entry', 'conflict-highlight');
-    });
+    // Clear any existing pencil marks
+    const pencilMarksContainer = selectedCell.querySelector('.pencil-mark');
+    if (pencilMarksContainer) {
+        pencilMarksContainer.remove();
+    }
 
-    // Update the cell with the new number
     selectedCell.textContent = num;
     gameBoard[row][col] = num;
-
-    // Highlight matching numbers
     highlightMatchingNumbers(num);
 
     if (solutionBoard[row][col] === num) {
-        selectedCell.classList.add('correct-number');
-        selectedCell.style.animation = 'numberEnter 0.3s ease';
-        
-        setTimeout(() => {
-            selectedCell.style.animation = '';
-        }, 300);
-        
-        if (isPuzzleComplete()) {
-            handlePuzzleCompletion();
-        }
+        handleCorrectEntry(row, col, num);
     } else {
-        // Handle incorrect entry
-        mistakeCount++;
-        updateMistakeDisplay();
-        
-        if (mistakeCount >= MAX_MISTAKES) {
-            showGameOver();
-            return;
-        }
-
-        selectedCell.classList.add('wrong-entry');
-        
-        
-        // Show conflicts (row, column, box highlighting code remains the same)
-        // Highlight conflicts in row
-        for (let i = 0; i < 9; i++) {
-            if (i !== col && gameBoard[row][i] === num) {
-                cells[row * 9 + i].classList.add('conflict-highlight');
-            }
-        }
-        
-        // Highlight conflicts in column
-        for (let i = 0; i < 9; i++) {
-            if (i !== row && gameBoard[i][col] === num) {
-                cells[i * 9 + col].classList.add('conflict-highlight');
-            }
-        }
-        
-        // Highlight conflicts in 3x3 box
-        const boxStartRow = Math.floor(row / 3) * 3;
-        const boxStartCol = Math.floor(col / 3) * 3;
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                const currentRow = boxStartRow + i;
-                const currentCol = boxStartCol + j;
-                 if ((currentRow !== row || currentCol !== col) && 
-                     gameBoard[currentRow][currentCol] === num) {
-                    cells[currentRow * 9 + currentCol].classList.add('conflict-highlight');
-                }
-            }
-        }
-
-        selectedCell.style.animation = 'invalidMove 0.3s ease';
-        setTimeout(() => {
-            selectedCell.style.animation = '';
-        }, 300);
+        handleIncorrectEntry(row, col, num, cells);
     }
+}
+
+function handleCorrectEntry(row, col, num) {
+    selectedCell.classList.add('correct-number');
+    addEntryAnimation(selectedCell, 'numberEnter');
+    clearRelatedPencilMarks(row, col, num);
+
+    if (isPuzzleComplete()) {
+        handlePuzzleCompletion();
+    }
+}
+
+function handleIncorrectEntry(row, col, num, cells) {
+    mistakeCount++;
+    updateMistakeDisplay();
+    
+    if (mistakeCount >= MAX_MISTAKES) {
+        showGameOver();
+        return;
+    }
+
+    selectedCell.classList.add('wrong-entry');
+    highlightConflicts(row, col, num, cells);
+    addEntryAnimation(selectedCell, 'invalidMove');
+}
+
+function highlightConflicts(row, col, num, cells) {
+    // Highlight row conflicts
+    for (let i = 0; i < 9; i++) {
+        if (i !== col && gameBoard[row][i] === num) {
+            cells[row * 9 + i].classList.add('conflict-highlight');
+        }
+    }
+
+    // Highlight column conflicts
+    for (let i = 0; i < 9; i++) {
+        if (i !== row && gameBoard[i][col] === num) {
+            cells[i * 9 + col].classList.add('conflict-highlight');
+        }
+    }
+
+    // Highlight box conflicts
+    const boxStartRow = Math.floor(row / 3) * 3;
+    const boxStartCol = Math.floor(col / 3) * 3;
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            const currentRow = boxStartRow + i;
+            const currentCol = boxStartCol + j;
+            if ((currentRow !== row || currentCol !== col) && 
+                gameBoard[currentRow][currentCol] === num) {
+                cells[currentRow * 9 + currentCol].classList.add('conflict-highlight');
+            }
+        }
+    }
+}
+
+function addEntryAnimation(cell, animationType) {
+    cell.style.animation = `${animationType} 0.3s ease`;
+    setTimeout(() => {
+        cell.style.animation = '';
+    }, 300);
+}
+
+function clearRelatedPencilMarks(row, col, num) {
+    const cells = document.querySelectorAll('.cell');
+    const affectedCells = new Set();
+
+    // Get all affected cells (row, column, and box)
+    for (let i = 0; i < 9; i++) {
+        affectedCells.add(row * 9 + i);  // Row cells
+        affectedCells.add(i * 9 + col);  // Column cells
+    }
+
+    // Box cells
+    const boxStartRow = Math.floor(row / 3) * 3;
+    const boxStartCol = Math.floor(col / 3) * 3;
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            affectedCells.add((boxStartRow + i) * 9 + (boxStartCol + j));
+        }
+    }
+
+    // Clear pencil marks in affected cells
+    affectedCells.forEach(cellIndex => {
+        const cell = cells[cellIndex];
+        const pencilMarksContainer = cell.querySelector('.pencil-mark');
+        if (pencilMarksContainer) {
+            const currentMarks = pencilMarksContainer.textContent.split(' ').filter(Boolean);
+            pencilMarksContainer.textContent = currentMarks
+                .filter(mark => mark !== num.toString())
+                .join(' ');
+
+            // Remove container if no marks left
+            if (!pencilMarksContainer.textContent.trim()) {
+                pencilMarksContainer.remove();
+            }
+        }
+    });
 }
 
 function initializeMistakeCounter() {
@@ -702,23 +794,24 @@ document.head.appendChild(highlightStyles);
 }
 
        
-            // Handle keyboard input
-            function handleKeyInput(e, cell) {
+    // Modify the existing handleKeyInput function to work with pencil marks
+function handleKeyInput(e, cell) {
     const key = e.key;
     if (key >= '1' && key <= '9') {
         selectCell(cell);
         enterNumber(parseInt(key));
     } else if (key === 'Backspace' || key === 'Delete') {
         if (selectedCell) {
-            selectedCell.textContent = '';
             const index = [...cells].indexOf(selectedCell);
+            pencilMarks[index]?.clear();
+            selectedCell.innerHTML = '';
             const row = Math.floor(index / 9);
             const col = index % 9;
             gameBoard[row][col] = 0;
-            highlightMatchingNumbers(null); // Clear number highlights
+            updatePencilMarksDisplay(selectedCell, index);
         }
     }
-}   
+}
 
     
         
@@ -865,6 +958,13 @@ function logoutUser() {
         }
     });
 }
+// Add event listener for the notes button
+document.addEventListener('DOMContentLoaded', () => {
+    const notesButton = document.querySelector('.option-img1');
+    if (notesButton) {
+        notesButton.addEventListener('click', togglePencilMode);
+    }
+});
 
     </script>
 </body>
