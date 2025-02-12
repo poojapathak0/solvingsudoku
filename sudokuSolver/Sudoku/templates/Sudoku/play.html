@@ -258,6 +258,9 @@
         <p id ="score_val"> 0</p>
         <p id="timer">Timer:</p>
         <p id="timer_val"> 00:00</p>
+        <button id="pause-btn" class="btn btn-warning">
+            Pause
+        </button>
         <div class="smallrectangle">
             <p id="solve">Solve</p>
         </div>
@@ -408,6 +411,258 @@ function togglePencilMode() {
             });
         }
     }
+    //user time implementation 
+class SudokuTimer {
+    constructor() {
+        this.seconds = 0;
+        this.timer = null;
+        this.isPaused = false;
+        this.currentLevel = this.getCurrentLevel();
+
+        // DOM elements
+        this.timerDisplay = document.getElementById('timer_val');
+        this.pauseBtn = document.getElementById('pause-btn');
+        this.restartBtn = document.getElementById('restartBtn');
+        this.newGameBtn = document.getElementById('newGameBtn');
+        this.grid = document.querySelector('.sudoku-grid');
+        
+        // Bind event listeners
+        this.pauseBtn.addEventListener('click', () => this.togglePause());
+        if (this.restartBtn) {
+            this.restartBtn.addEventListener('click', () => this.resetTimer());
+        }
+        if (this.newGameBtn) {
+            this.newGameBtn.addEventListener('click', () => this.resetTimer());
+        }
+        
+        // Load saved state
+        this.loadState();
+        
+        // Start timer if not paused
+        if (!this.isPaused) {
+            this.startTimer();
+        } else {
+            this.updateDisplay();
+            this.updatePauseButton();
+            this.updateGridState();
+        }
+    }
+
+    getCurrentLevel() {
+        return sessionStorage.getItem('currentLevel') || 'beginner';
+    }
+
+    resetTimer() {
+        if (this.timer) {
+            clearInterval(this.timer);
+        }
+        
+        this.seconds = 0;
+        this.isPaused = false;
+        
+        this.updateDisplay();
+        this.updatePauseButton();
+        this.updateGridState();
+        
+        this.clearSavedState();
+        this.startTimer();
+    }
+
+    clearSavedState() {
+        document.cookie = `sudokuTimer_${this.currentLevel}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+
+    startTimer() {
+        if (this.timer) clearInterval(this.timer);
+        
+        this.timer = setInterval(() => {
+            if (!this.isPaused) {
+                this.seconds++;
+                this.updateDisplay();
+                this.saveState();
+            }
+        }, 1000);
+        
+        this.isPaused = false;
+        this.updatePauseButton();
+        this.updateGridState();
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        this.updatePauseButton();
+        this.updateGridState();
+        this.saveState();
+    }
+
+    updatePauseButton() {
+        this.pauseBtn.textContent = this.isPaused ? 'Resume' : 'Pause';
+        if (this.isPaused) {
+            this.pauseBtn.classList.remove('btn-warning');
+            this.pauseBtn.classList.add('btn-success');
+        } else {
+            this.pauseBtn.classList.remove('btn-success');
+            this.pauseBtn.classList.add('btn-warning');
+        }
+    }
+
+    updateGridState() {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            if (!cell.classList.contains('pre-filled')) {
+                if (this.isPaused) {
+                    cell.style.pointerEvents = 'none';
+                    cell.classList.add('disabled');
+                } else {
+                    cell.style.pointerEvents = 'auto';
+                    cell.classList.remove('disabled');
+                }
+            }
+        });
+
+        const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
+        numberButtons.forEach(button => {
+            button.style.pointerEvents = this.isPaused ? 'none' : 'auto';
+            if (this.isPaused) {
+                button.classList.add('disabled');
+            } else {
+                button.classList.remove('disabled');
+            }
+        });
+    }
+
+    updateDisplay() {
+        const minutes = Math.floor(this.seconds / 60);
+        const remainingSeconds = this.seconds % 60;
+        this.timerDisplay.textContent = 
+            `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    saveState() {
+        const state = {
+            seconds: this.seconds,
+            isPaused: this.isPaused,
+            timestamp: Date.now(),
+            level: this.currentLevel
+        };
+        document.cookie = `sudokuTimer_${this.currentLevel}=${JSON.stringify(state)}; path=/; max-age=86400`;
+    }
+
+    loadState() {
+        const cookie = document.cookie.split('; ')
+            .find(row => row.startsWith(`sudokuTimer_${this.currentLevel}=`));
+        
+        if (cookie) {
+            const state = JSON.parse(cookie.split('=')[1]);
+            if (state.level === this.currentLevel) {
+                this.seconds = state.seconds;
+                this.isPaused = state.isPaused;
+
+                if (!this.isPaused && state.timestamp) {
+                    const timePassed = Math.floor((Date.now() - state.timestamp) / 1000);
+                    this.seconds += timePassed;
+                }
+            } else {
+                this.resetTimer();
+            }
+        }
+    }
+
+    getFormattedTime() {
+        const minutes = Math.floor(this.seconds / 60);
+        const remainingSeconds = this.seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+}
+
+// Add CSS styles for disabled state
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+    .cell.disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
+    .rectangle1.disabled,
+    .rectangle2.disabled,
+    .rectangle3.disabled,
+    .rectangle4.disabled,
+    .rectangle5.disabled,
+    .rectangle6.disabled,
+    .rectangle7.disabled,
+    .rectangle8.disabled,
+    .rectangle9.disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+`;
+document.head.appendChild(styleSheet);
+
+// Modify your level selection code in level.html
+document.addEventListener("DOMContentLoaded", function () {
+    // Only add this code if we're on the level selection page
+    if (document.querySelector('.rectangle1')) {
+        const difficulties = {
+            beginner: 50,
+            easy: 40,
+            medium: 35,
+            hard: 27,
+            extreme: 20
+        };
+
+        document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
+            element.addEventListener("click", function () {
+                const difficultyText = element.querySelector('p').id;
+                const difficulty = difficultyText.split("-")[0];
+
+                // Store the selected difficulty level
+                sessionStorage.setItem('currentLevel', difficulty);
+
+                // Clear any existing timer state for this level
+                document.cookie = `sudokuTimer_${difficulty}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+
+                // Your existing difficulty selection code
+                selectDifficulty(difficulty);
+
+                const clues = difficulties[difficulty];
+                console.log(`Generating puzzle with ${clues} clues for ${difficulty} difficulty`);
+                
+                fetch('/sudoku/generate/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ 
+                        clues: clues
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    sessionStorage.setItem('sudokuPuzzle', JSON.stringify(data.puzzle));
+                    sessionStorage.setItem('solutionBoard', JSON.stringify(data.solutionBoard));
+                    
+                    window.location.href = '/play/';
+                })
+                .catch(error => {
+                    console.error('Error generating puzzle:', error);
+                    alert('Error generating puzzle. Please try again.');
+                });
+            });
+        });
+    }
+});
+
+// Initialize timer only on the play page
+if (window.location.pathname.includes('/play')) {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.sudokuTimer = new SudokuTimer();
+    });
+}
 
     document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
