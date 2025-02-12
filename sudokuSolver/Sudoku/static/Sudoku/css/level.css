@@ -190,7 +190,7 @@ nav {
 
 /* Blur effect for non-hovered buttons */
 .buttons:hover > div:not(:hover) {
-  filter: blur(2px);
+  filter: blur(0.6px);
   opacity: 0.7;
 }
 
