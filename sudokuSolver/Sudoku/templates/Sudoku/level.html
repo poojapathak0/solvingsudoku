@@ -303,6 +303,39 @@ function logoutUser() {
                 sidebar.classList.remove('active'); // Hide the sidebar  
             }  
         });
+   
+        document.addEventListener("DOMContentLoaded", function () {
+    if (document.querySelector('.rectangle1')) {
+        const difficulties = {
+            beginner: 50,
+            easy: 40,
+            medium: 35,
+            hard: 27,
+            extreme: 20
+        };
+
+        document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
+            element.addEventListener("click", function () {
+                const difficultyText = element.querySelector('p').id;
+                const difficulty = difficultyText.split("-")[0];
+
+                // Store the selected difficulty level
+                sessionStorage.setItem('currentLevel', difficulty);
+                
+                // Clear ALL timer states when selecting a new difficulty
+                const difficulties = ['beginner', 'easy', 'medium', 'hard', 'extreme'];
+                difficulties.forEach(level => {
+                    document.cookie = `sudokuTimer_${level}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                });
+
+                // Store the new level in localStorage for comparison
+                localStorage.setItem('lastLevel', difficulty);
+
+                // existing difficulty selection code...
+            });
+        });
+    }
+});
 
 
 </script>  
