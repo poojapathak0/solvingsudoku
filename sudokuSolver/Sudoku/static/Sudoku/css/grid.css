@@ -976,21 +976,32 @@ nav {
 }
 
 .score-display {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.8rem;
-  margin-bottom: 0.4rem;
-}
-
-.score-label {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 0.2rem;
-}
-
-.score-value {
-  font-size: 1.2rem;
-  color: #333;
+  font-size: 1.5rem;
   font-weight: bold;
+  color: #2c3e50;
+}
+
+.timer-display {
+  font-family: monospace;
+  font-size: 1.2rem;
+  color: #34495e;
+}
+
+.pause-play-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.pause-play-btn:hover {
+  transform: scale(1.1);
+}
+
+.disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .dropdown-item {

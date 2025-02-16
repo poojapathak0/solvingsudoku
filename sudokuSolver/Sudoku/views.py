@@ -260,3 +260,60 @@ def solve_sudoku(request):
         'error': 'Invalid request method'
     })
 
+# load game state
+# Add to views.py
+@login_required
+def save_game_state(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_info = UserInfo.objects.get(user=request.user)
+            
+            user_info.current_game_state = data.get('gameBoard')
+            user_info.current_solution = data.get('solutionBoard')
+            user_info.current_score = data.get('score')
+            user_info.current_time = data.get('time')
+            user_info.difficulty_level = data.get('difficulty')
+            user_info.is_game_in_progress = True
+            
+            user_info.save()
+            
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+@login_required
+def get_game_state(request):
+    try:
+        user_info = UserInfo.objects.get(user=request.user)
+        if user_info.is_game_in_progress:
+            return JsonResponse({
+                'status': 'success',
+                'gameState': {
+                    'gameBoard': user_info.current_game_state,
+                    'solutionBoard': user_info.current_solution,
+                    'score': user_info.current_score,
+                    'time': user_info.current_time,
+                    'difficulty': user_info.difficulty_level
+                }
+            })
+        return JsonResponse({'status': 'no_game'})
+    except UserInfo.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User info not found'})
+    
+def check_game_state(request):
+    if request.method == 'GET':
+        if not request.user.is_authenticated:
+            return JsonResponse({'game_in_progress': False})
+            
+        try:
+            user_info = UserInfo.objects.get(user=request.user)
+            return JsonResponse({
+                'game_in_progress': user_info.is_game_in_progress
+            })
+        except UserInfo.DoesNotExist:
+            return JsonResponse({'game_in_progress': False})
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

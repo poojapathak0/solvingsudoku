@@ -15,4 +15,6 @@ urlpatterns = [
     path('solve-sudoku/', views.solve_sudoku, name='solve_sudoku'),
     path('sudoku/generate/', views.sudokuGenerate, name='generate_sudoku'),
     path('set-difficulty/', views.set_difficulty, name='set_difficulty'),
+    path('save-game-state/', views.save_game_state, name='save_game_state'),
+    path('get-game-state/', views.get_game_state, name='get_game_state'),
 ]

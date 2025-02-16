@@ -239,7 +239,7 @@
 <div class="orectangle">
     <div class="option">
         <div class="option-img1"> 
-            <img src="{% static 'Sudoku/images/undo.svg' %}" alt="undo">
+            <img src="{% static 'Sudoku/images/pencil.png' %}" alt="undo">
             <p id = "notes">Notes</p>
         </div>
         <div class="option-img2">
@@ -280,6 +280,123 @@
 // Global variables for pencil mode
 let isPencilMode = false;
 let pencilMarks = Array(81).fill().map(() => new Set());
+
+
+// Score
+let currentScore = 0;
+const CORRECT_MOVE_SCORE = 40;
+// Function to save game state periodically
+function setupAutoSave() {
+    // Save every 30 seconds
+    setInterval(saveGameState, 30000);
+    
+    // Save when window is closed
+    window.addEventListener('beforeunload', saveGameState);
+}
+document.addEventListener('DOMContentLoaded', async () => {
+    const gameLoaded = await loadPreviousGame();
+    
+    if (!gameLoaded) {
+        // Initialize new game as before
+        initializeGrid();
+        initializeNumberButtons();
+        initializeGameControls();
+        
+        // Load puzzle and solution from session storage
+        const puzzleData = sessionStorage.getItem('sudokuPuzzle');
+        const solutionData = sessionStorage.getItem('solutionBoard');
+        
+        try {
+            if (puzzleData && solutionData) {
+                const puzzle = JSON.parse(puzzleData);
+                solutionBoard = JSON.parse(solutionData);
+                renderPuzzle(puzzle);
+                gameBoard = puzzle.map(row => [...row]);
+            }
+        } catch (error) {
+            console.error('Error initializing game:', error);
+            window.location.href = '/level/';
+        }
+    }
+    
+    // Setup auto-save regardless of whether it's a new or loaded game
+    setupAutoSave();
+});
+function saveGameState() {
+    const gameState = {
+        gameBoard: gameBoard,
+        solutionBoard: solutionBoard,
+        score: currentScore,
+        time: window.sudokuTimer ? window.sudokuTimer.seconds : 0,
+        difficulty: document.querySelector('.difficulty-level').textContent
+    };
+
+    fetch('/save-game-state/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(gameState)
+    });
+}
+
+// Function to load previous game state
+async function loadPreviousGame() {
+    try {
+        const response = await fetch('/get-game-state/');
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const gameState = data.gameState;
+            
+            // Restore game board
+            gameBoard = gameState.gameBoard;
+            solutionBoard = gameState.solutionBoard;
+            
+            // Restore score
+            currentScore = gameState.score;
+            updateScoreDisplay();
+            
+            // Restore timer
+            if (window.sudokuTimer) {
+                window.sudokuTimer.setTime(gameState.time);
+            }
+            
+            // Render the restored board
+            renderSavedBoard(gameBoard);
+            
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error loading game state:', error);
+        return false;
+    }
+}
+
+// Function to render saved board
+function renderSavedBoard(board) {
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach((cell, index) => {
+        const row = Math.floor(index / 9);
+        const col = index % 9;
+        const value = board[row][col];
+        
+        if (value !== 0) {
+            cell.textContent = value;
+            if (value === solutionBoard[row][col]) {
+                cell.classList.add('correct-number');
+            }
+            if (cell.classList.contains('pre-filled')) {
+                cell.classList.add('pre-filled');
+            }
+        }
+    });
+}
+
+
+
      // Initialize the grid
     // Initialize game controls
     function initializeGameControls() {
@@ -504,6 +621,10 @@ class SudokuTimer {
             this.pauseBtn.classList.remove('btn-success');
             this.pauseBtn.classList.add('btn-warning');
         }
+    }
+    setTime(seconds) {
+        this.seconds = seconds;
+        this.updateDisplay();
     }
 
     updateGridState() {
@@ -807,9 +928,21 @@ function handleCorrectEntry(row, col, num) {
     selectedCell.classList.add('correct-number');
     addEntryAnimation(selectedCell, 'numberEnter');
     clearRelatedPencilMarks(row, col, num);
+    
+    // Update score
+    currentScore += CORRECT_MOVE_SCORE;
+    updateScoreDisplay();
 
     if (isPuzzleComplete()) {
         handlePuzzleCompletion();
+    }
+}
+
+//  function to update score display
+function updateScoreDisplay() {
+    const scoreDisplay = document.getElementById('score_val');
+    if (scoreDisplay) {
+        scoreDisplay.textContent = currentScore;
     }
 }
 
