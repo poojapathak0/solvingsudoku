@@ -535,7 +535,6 @@ class SudokuTimer {
         this.timer = null;
         this.isPaused = false;
         this.currentLevel = this.getCurrentLevel();
-        this.previousLevel = localStorage.getItem('lastLevel');
 
         // DOM elements
         this.timerDisplay = document.getElementById('timer_val');
@@ -543,14 +542,18 @@ class SudokuTimer {
         this.restartBtn = document.getElementById('restartBtn');
         this.newGameBtn = document.getElementById('newGameBtn');
         this.grid = document.querySelector('.sudoku-grid');
-        // Bind event listeners
-        this.pauseBtn?.addEventListener('click', () => this.togglePause());
-        this.restartBtn?.addEventListener('click', () => this.resetTimer());
-        this.newGameBtn?.addEventListener('click', () => this.resetTimer());
         
-         
-        // Check if level has changed
-        this.checkLevelChange();
+        // Bind event listeners
+        this.pauseBtn.addEventListener('click', () => this.togglePause());
+        if (this.restartBtn) {
+            this.restartBtn.addEventListener('click', () => this.resetTimer());
+        }
+        if (this.newGameBtn) {
+            this.newGameBtn.addEventListener('click', () => this.resetTimer());
+        }
+        
+        // Load saved state
+        this.loadState();
         
         // Start timer if not paused
         if (!this.isPaused) {
@@ -564,33 +567,6 @@ class SudokuTimer {
 
     getCurrentLevel() {
         return sessionStorage.getItem('currentLevel') || 'beginner';
-    }
-
-    checkLevelChange() {
-        const lastLevel = localStorage.getItem('lastLevel');
-        const currentUrl = window.location.pathname;
-        const referrer = document.referrer;
-        
-        // Reset timer if:
-        // 1. Level has changed
-        // 2. Coming from level selection page
-        // 3. No previous level stored
-        if (!lastLevel || 
-            lastLevel !== this.currentLevel || 
-            referrer.includes('/level')) {
-            this.resetTimer();
-            this.clearAllTimerStates();
-        }
-        
-        // Update stored level
-        localStorage.setItem('lastLevel', this.currentLevel);
-    }
-
-    clearAllTimerStates() {
-        const difficulties = ['beginner', 'easy', 'medium', 'hard', 'extreme'];
-        difficulties.forEach(level => {
-            document.cookie = `sudokuTimer_${level}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        });
     }
 
     resetTimer() {
@@ -637,7 +613,6 @@ class SudokuTimer {
     }
 
     updatePauseButton() {
-        if (this.pauseBtn) {
         this.pauseBtn.textContent = this.isPaused ? 'Resume' : 'Pause';
         if (this.isPaused) {
             this.pauseBtn.classList.remove('btn-warning');
@@ -653,7 +628,6 @@ class SudokuTimer {
     }
 
     updateGridState() {
-        // Disable/enable grid cells
         const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => {
             if (!cell.classList.contains('pre-filled')) {
@@ -667,7 +641,6 @@ class SudokuTimer {
             }
         });
 
-        // Disable/enable number buttons
         const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
         numberButtons.forEach(button => {
             button.style.pointerEvents = this.isPaused ? 'none' : 'auto';
@@ -680,12 +653,10 @@ class SudokuTimer {
     }
 
     updateDisplay() {
-        if (this.timerDisplay) {
         const minutes = Math.floor(this.seconds / 60);
         const remainingSeconds = this.seconds % 60;
         this.timerDisplay.textContent = 
             `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
     }
 
     saveState() {
@@ -748,8 +719,9 @@ styleSheet.textContent = `
 `;
 document.head.appendChild(styleSheet);
 
-//Level selection code
+// Modify your level selection code in level.html
 document.addEventListener("DOMContentLoaded", function () {
+    // Only add this code if we're on the level selection page
     if (document.querySelector('.rectangle1')) {
         const difficulties = {
             beginner: 50,
@@ -766,15 +738,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Store the selected difficulty level
                 sessionStorage.setItem('currentLevel', difficulty);
-                
-                // Clear ALL timer states when selecting a new difficulty
-                const difficulties = ['beginner', 'easy', 'medium', 'hard', 'extreme'];
-                difficulties.forEach(level => {
-                    document.cookie = `sudokuTimer_${level}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-                 });
 
-         // Store the new level in localStorage for comparison
-          localStorage.setItem('lastLevel', difficulty);
+                // Clear any existing timer state for this level
+                document.cookie = `sudokuTimer_${difficulty}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 
                 // Your existing difficulty selection code
                 selectDifficulty(difficulty);
@@ -818,6 +784,7 @@ if (window.location.pathname.includes('/play')) {
         window.sudokuTimer = new SudokuTimer();
     });
 }
+
     document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
     initializeNumberButtons();
