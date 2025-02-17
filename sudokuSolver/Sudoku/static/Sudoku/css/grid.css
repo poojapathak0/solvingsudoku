@@ -336,17 +336,17 @@ nav {
 }
 
 .cell.number-highlight {
-  background-color: #fff3e0; /* Light highlight for matching numbers */
+  background-color: #ffc76e; /* Light highlight for matching numbers */
 }
 
 .cell.selected.number-highlight {
-  background-color: #ffad3a; /* Stronger highlight for selected cell */
+  background-color: #fdbb60; /* Stronger highlight for selected cell */
   color: white;
 }
 
 /* Update the existing styles */
 .cell.selected {
-  background-color: #ffad3a;
+  background-color: #fdbb60;
   color: white;
 }
 

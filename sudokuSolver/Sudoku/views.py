@@ -213,20 +213,27 @@ def game_view(request):
     return redirect('login')
 
 def save_game_state(request):
-    if request.method == 'POST' and request.user.is_authenticated:
-        data = json.loads(request.body)
-        game_state = data.get('game_state')
-        time = data.get('time')
-        score = data.get('score')
-        
-        game_data = UserInfo.objects.get(user=request.user)
-        game_data.game_state = game_state
-        game_data.time = time
-        game_data.score = score
-        game_data.save()
-        
-        return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'error'}, status=400)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_info = UserInfo.objects.get(user=request.user)
+            
+            user_info.current_game_state = data.get('gameBoard')
+            user_info.current_solution = data.get('solutionBoard')
+            user_info.current_score = data.get('score')
+            user_info.current_time = data.get('time')
+            user_info.difficulty_level = data.get('difficulty')
+            user_info.is_game_in_progress = True
+            user_info.is_paused = data.get('isPaused', False)  # Add pause state
+            
+            user_info.save()
+            
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
 
 @csrf_exempt
 def solve_sudoku(request):
@@ -296,7 +303,8 @@ def get_game_state(request):
                     'solutionBoard': user_info.current_solution,
                     'score': user_info.current_score,
                     'time': user_info.current_time,
-                    'difficulty': user_info.difficulty_level
+                    'difficulty': user_info.difficulty_level,
+                    'isPaused': user_info.is_paused  # Add pause state to response
                 }
             })
         return JsonResponse({'status': 'no_game'})

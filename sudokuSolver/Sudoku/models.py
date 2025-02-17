@@ -14,6 +14,7 @@ class UserInfo(models.Model):
     current_time = models.IntegerField(default=0)                
     difficulty_level = models.CharField(max_length=20, default='beginner')
     is_game_in_progress = models.BooleanField(default=False)
+    is_paused = models.BooleanField(default=False)  # Add this field
 
 
 @receiver(post_save, sender=User)  

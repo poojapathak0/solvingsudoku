@@ -544,18 +544,43 @@ class SudokuTimer {
         this.grid = document.querySelector('.sudoku-grid');
         
         // Bind event listeners
-        this.pauseBtn.addEventListener('click', () => this.togglePause());
+        this.pauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from triggering document click
+            this.togglePause();
+        });
+        
         if (this.restartBtn) {
             this.restartBtn.addEventListener('click', () => this.resetTimer());
         }
         if (this.newGameBtn) {
             this.newGameBtn.addEventListener('click', () => this.resetTimer());
         }
+
+        // Add document-wide click listener for resuming
+        document.addEventListener('click', () => {
+            if (this.isPaused) {
+                this.resumeGame();
+            }
+        });
         
-        // Load saved state
-        this.loadState();
+        // Load saved state and initialize
+        this.initialize();
+    }
+
+    resumeGame() {
+        if (this.isPaused) {
+            this.isPaused = false;
+            this.updatePauseButton();
+            this.updateGridState();
+            this.saveState();
+            this.startTimer();
+        }
+    }
+    
+    async initialize() {
+        await this.loadState();
         
-        // Start timer if not paused
+        // Start timer only if not paused
         if (!this.isPaused) {
             this.startTimer();
         } else {
@@ -589,6 +614,7 @@ class SudokuTimer {
         document.cookie = `sudokuTimer_${this.currentLevel}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     }
 
+
     startTimer() {
         if (this.timer) clearInterval(this.timer);
         
@@ -610,7 +636,14 @@ class SudokuTimer {
         this.updatePauseButton();
         this.updateGridState();
         this.saveState();
+        
+        if (!this.isPaused) {
+            this.startTimer();
+        } else if (this.timer) {
+            clearInterval(this.timer);
+        }
     }
+
 
     updatePauseButton() {
         this.pauseBtn.textContent = this.isPaused ? 'Resume' : 'Pause';
@@ -622,35 +655,74 @@ class SudokuTimer {
             this.pauseBtn.classList.add('btn-warning');
         }
     }
+    
     setTime(seconds) {
         this.seconds = seconds;
         this.updateDisplay();
     }
-
     updateGridState() {
+        const overlay = document.createElement('div');
+        overlay.id = 'pauseOverlay';
+        overlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        `;
+        overlay.textContent = 'PAUSED';
+
+        // Remove existing overlay if it exists
+        const existingOverlay = document.getElementById('pauseOverlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+
+        const sudokuContainer = document.querySelector('.sudoku-container');
+        if (sudokuContainer) {
+            sudokuContainer.style.position = 'relative';
+            sudokuContainer.appendChild(overlay);
+        }
+
+        if (this.isPaused) {
+            overlay.style.display = 'flex';
+            this.setInteractiveElementsState(false);
+        } else {
+            overlay.style.display = 'none';
+            this.setInteractiveElementsState(true);
+        }
+    }
+    
+    setInteractiveElementsState(enabled) {
+        // Disable/enable cells
         const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => {
             if (!cell.classList.contains('pre-filled')) {
-                if (this.isPaused) {
-                    cell.style.pointerEvents = 'none';
-                    cell.classList.add('disabled');
-                } else {
-                    cell.style.pointerEvents = 'auto';
-                    cell.classList.remove('disabled');
-                }
+                cell.style.pointerEvents = enabled ? 'auto' : 'none';
             }
         });
 
-        const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
+        // Disable/enable number buttons
+        const numberButtons = document.querySelectorAll('[class^="rectangle"]');
         numberButtons.forEach(button => {
-            button.style.pointerEvents = this.isPaused ? 'none' : 'auto';
-            if (this.isPaused) {
-                button.classList.add('disabled');
-            } else {
-                button.classList.remove('disabled');
-            }
+            button.style.pointerEvents = enabled ? 'auto' : 'none';
+        });
+
+        // Disable/enable control buttons (except pause/resume)
+        const controlButtons = document.querySelectorAll('.option-img1, .option-img2, .option-img3');
+        controlButtons.forEach(button => {
+            button.style.pointerEvents = enabled ? 'auto' : 'none';
         });
     }
+
 
     updateDisplay() {
         const minutes = Math.floor(this.seconds / 60);
@@ -660,13 +732,43 @@ class SudokuTimer {
     }
 
     saveState() {
-        const state = {
-            seconds: this.seconds,
-            isPaused: this.isPaused,
-            timestamp: Date.now(),
-            level: this.currentLevel
-        };
-        document.cookie = `sudokuTimer_${this.currentLevel}=${JSON.stringify(state)}; path=/; max-age=86400`;
+        fetch('/save-game-state/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                gameBoard: gameBoard,
+                solutionBoard: solutionBoard,
+                score: currentScore,
+                time: this.seconds,
+                difficulty: document.querySelector('.difficulty-level').textContent,
+                isPaused: this.isPaused
+            })
+        });
+    }
+
+    async loadState() {
+        try {
+            const response = await fetch('/get-game-state/');
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                const gameState = data.gameState;
+                this.seconds = gameState.time;
+                this.isPaused = gameState.isPaused || false;
+                
+                this.updateDisplay();
+                this.updatePauseButton();
+                this.updateGridState();
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error loading game state:', error);
+            return false;
+        }
     }
 
     loadState() {
@@ -715,6 +817,15 @@ styleSheet.textContent = `
     .rectangle9.disabled {
         opacity: 0.7;
         cursor: not-allowed;
+    }
+`;
+document.head.appendChild(styleSheet);
+styleSheet.textContent = `
+    #pauseOverlay {
+        transition: background-color 0.3s ease;
+    }
+    #pauseOverlay:hover {
+        background: rgba(255, 255, 255, 0.8);
     }
 `;
 document.head.appendChild(styleSheet);
