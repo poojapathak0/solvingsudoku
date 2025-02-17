@@ -266,10 +266,7 @@
     </div>
     <div class="dialouge">
         <div class="rectangle">
-            <p id="score">Score:</p>
-            <p id ="score_val"> 0</p>
-            <p id="timer">Timer:</p>
-            <p id="timer_val"> 00:00</p>
+ 
             <div class="smallrectangle">
                 <p id="solve">Solve</p>
             </div>
@@ -280,16 +277,136 @@
             
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const cells = document.querySelectorAll('.cell');
-            const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
-            const eraseBtn = document.querySelector('.option-img3');
-            const undoBtn = document.querySelector('.option-img2');
-    
             let selectedCell = null;
-            let gameHistory = [];
             let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
-    
-            // Validation Function
+            let gameHistory = [];
+        
+            // Initialize the grid
+            function initializeGrid() {
+                const cells = document.querySelectorAll('.cell');
+                cells.forEach((cell, index) => {
+                    cell.setAttribute('tabindex', '0');
+                    cell.addEventListener('click', () => selectCell(cell));
+                    cell.addEventListener('keydown', (e) => handleKeyInput(e, cell, index));
+                    cell.addEventListener('focus', () => selectCell(cell));
+                });
+            }
+        
+            // Handle cell selection
+            function selectCell(cell) {
+                selectedCell = cell;
+                highlightRelatedCells(cell);
+            }
+        
+            // Handle keyboard input
+            function handleKeyInput(e, cell, index) {
+                if (e.key >= '1' && e.key <= '9') {
+                    e.preventDefault();
+                    handleNumberInput(cell, parseInt(e.key), index);
+                } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                    e.preventDefault();
+                    clearCell(cell, index);
+                } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                    e.preventDefault();
+                    handleArrowNavigation(e.key, index);
+                }
+            }
+        
+            // Handle number input
+            function handleNumberInput(cell, number, index) {
+                const row = Math.floor(index / 9);
+                const col = index % 9;
+                
+                recordHistory(cell, gameBoard[row][col]);
+                
+                if (validateCell(row, col, number)) {
+                    cell.textContent = number;
+                    gameBoard[row][col] = number;
+                    cell.classList.remove('invalid');
+                    highlightRelatedCells(cell);
+                } else {
+                    showInvalidInput(cell);
+                }
+            }
+        
+            // Show invalid input animation
+            function showInvalidInput(cell) {
+                cell.classList.add('invalid');
+                cell.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    cell.style.animation = '';
+                }, 500);
+            }
+        
+            // Clear cell
+            function clearCell(cell, index) {
+                const row = Math.floor(index / 9);
+                const col = index % 9;
+                
+                recordHistory(cell, gameBoard[row][col]);
+                cell.textContent = '';
+                gameBoard[row][col] = 0;
+                cell.classList.remove('invalid');
+            }
+        
+            // Handle arrow key navigation
+            function handleArrowNavigation(key, currentIndex) {
+                const cells = document.querySelectorAll('.cell');
+                let nextIndex;
+                
+                switch(key) {
+                    case 'ArrowUp':
+                        nextIndex = currentIndex - 9;
+                        break;
+                    case 'ArrowDown':
+                        nextIndex = currentIndex + 9;
+                        break;
+                    case 'ArrowLeft':
+                        nextIndex = currentIndex - 1;
+                        break;
+                    case 'ArrowRight':
+                        nextIndex = currentIndex + 1;
+                        break;
+                }
+        
+                if (nextIndex >= 0 && nextIndex < cells.length) {
+                    cells[nextIndex].focus();
+                }
+            }
+        
+            // Highlight related cells
+            function highlightRelatedCells(cell) {
+                const cells = document.querySelectorAll('.cell');
+                cells.forEach(c => {
+                    c.classList.remove('highlighted', 'selected', 'row-highlight', 'column-highlight');
+                });
+        
+                const cellIndex = Array.from(cells).indexOf(cell);
+                const row = Math.floor(cellIndex / 9);
+                const col = cellIndex % 9;
+                const boxStartRow = Math.floor(row / 3) * 3;
+                const boxStartCol = Math.floor(col / 3) * 3;
+        
+                cells.forEach((c, i) => {
+                    const currentRow = Math.floor(i / 9);
+                    const currentCol = i % 9;
+        
+                    if (currentRow === row) {
+                        c.classList.add('row-highlight');
+                    }
+                    if (currentCol === col) {
+                        c.classList.add('column-highlight');
+                    }
+                    if (currentRow >= boxStartRow && currentRow < boxStartRow + 3 &&
+                        currentCol >= boxStartCol && currentCol < boxStartCol + 3) {
+                        c.classList.add('highlighted');
+                    }
+                });
+        
+                cell.classList.add('selected');
+            }
+        
+            // Validate cell input
             function validateCell(row, col, number) {
                 // Check row
                 for (let i = 0; i < 9; i++) {
@@ -317,249 +434,72 @@
                 
                 return true;
             }
-            function navigateToPlay() {
-    fetch('/check-game-state/', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.game_in_progress) {
-            window.location.href = "/play/";
-        } else {
-            window.location.href = "/level/";
-        }
-    })
-    .catch(error => {
-        console.error('Error checking game state:', error);
-        // Default to level page if there's an error
-        window.location.href = "/level/";
-    });
-}
-
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-            // Highlight related cells
-            function highlightRelatedCells(cell) {
-                // Remove all previous highlights
-                cells.forEach(c => {
-                    c.classList.remove('highlighted', 'selected', 'row-highlight', 'column-highlight');
-                });
-    
-                // Get cell index and row/column
-                const cellIndex = Array.from(cells).indexOf(cell);
-                const row = Math.floor(cellIndex / 9);
-                const col = cellIndex % 9;
-                const boxStartRow = Math.floor(row / 3) * 3;
-                const boxStartCol = Math.floor(col / 3) * 3;
-    
-                // Highlight entire row
-                cells.forEach((c, i) => {
-                    const currentRow = Math.floor(i / 9);
-                    const currentCol = i % 9;
-    
-                    if (currentRow === row) {
-                        c.classList.add('row-highlight');
-                    }
-    
-                    // Highlight entire column
-                    if (currentCol === col) {
-                        c.classList.add('column-highlight');
-                    }
-    
-                    // Highlight 3x3 box
-                    if (currentRow >= boxStartRow && currentRow < boxStartRow + 3 &&
-                        currentCol >= boxStartCol && currentCol < boxStartCol + 3) {
-                        c.classList.add('highlighted');
-                    }
-                });
-    
-                // Highlight the selected cell
-                cell.classList.add('selected');
-            }
-    
-            // History Recording
+        
+            // Record history for undo
             function recordHistory(cell, previousValue) {
-                const cellIndex = Array.from(cells).indexOf(cell);
+                const cellIndex = Array.from(document.querySelectorAll('.cell')).indexOf(cell);
                 const row = Math.floor(cellIndex / 9);
                 const col = cellIndex % 9;
-    
+        
                 gameHistory.push({
                     element: cell,
                     value: previousValue,
                     row: row,
                     col: col
                 });
-    
-                // Limit history to last 10 actions
+        
                 if (gameHistory.length > 10) {
                     gameHistory.shift();
                 }
             }
-    
-            // Cell Selection
-            cells.forEach((cell) => {
-                cell.addEventListener('click', () => {
-                    selectedCell = cell;
-                    highlightRelatedCells(cell);
-                });
-    
-                // Keyboard input handling
-                cell.addEventListener('keydown', (e) => {
-                    // Number input
-                    if (e.key >= '1' && e.key <= '9') {
-                        const number = parseInt(e.key);
-                        const cellIndex = Array.from(cells).indexOf(cell);
-                        const row = Math.floor(cellIndex / 9);
-                        const col = cellIndex % 9;
-                        
-                        // Record previous state for undo
-                        recordHistory(cell, gameBoard[row][col]);
-                        
-                        // Validate and enter the number
-                        if (validateCell(row, col, number)) {
-                            cell.textContent = number;
-                            gameBoard[row][col] = number;
-                            cell.classList.remove('invalid');
-                            highlightRelatedCells(cell);
-                        } else {
-                            cell.classList.add('invalid');
-                            cell.style.animation = 'shake 0.5s';
-                            setTimeout(() => {
-                                cell.style.animation = '';
-                            }, 500);
-                        }
-                    }
-                    
-                    // Backspace/Delete to clear
-                    if (e.key === 'Backspace' || e.key === 'Delete') {
-                        const cellIndex = Array.from(cells).indexOf(cell);
-                        const row = Math.floor(cellIndex / 9);
-                        const col = cellIndex % 9;
-                        
-                        recordHistory(cell, gameBoard[row][col]);
-                        cell.textContent = '';
-                        gameBoard[row][col] = 0;
-                        cell.classList.remove('invalid');
-                    }
-                });
-            });
-    
-            // Remove highlights and errors when clicking outside
-            document.addEventListener('click', (event) => {
-                const sudokuGrid = document.querySelector('.sudoku-grid');
-                const numberButtons = document.querySelector('.buttons');
-                
-                if (!sudokuGrid.contains(event.target) && !numberButtons.contains(event.target)) {
-                    cells.forEach(cell => {
-                        cell.classList.remove('highlighted', 'selected', 'row-highlight', 'column-highlight');
-                        
-                        // Remove invalid class after 3 seconds
-                        if (cell.classList.contains('invalid')) {
-                            setTimeout(() => {
-                                cell.classList.remove('invalid');
-                            }, 3000);
+        
+            // Setup event listeners for buttons
+            function setupButtonListeners() {
+                // Number buttons
+                const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
+                numberButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        if (selectedCell) {
+                            const number = parseInt(button.querySelector('p').textContent);
+                            const cellIndex = Array.from(document.querySelectorAll('.cell')).indexOf(selectedCell);
+                            handleNumberInput(selectedCell, number, cellIndex);
                         }
                     });
-                    
-                    selectedCell = null;
+                });
+        
+                // Erase button
+                const eraseBtn = document.querySelector('.option-img3');
+                if (eraseBtn) {
+                    eraseBtn.addEventListener('click', () => {
+                        if (selectedCell && selectedCell.textContent.trim() !== '') {
+                            const cellIndex = Array.from(document.querySelectorAll('.cell')).indexOf(selectedCell);
+                            clearCell(selectedCell, cellIndex);
+                        }
+                    });
                 }
-            });
-    
-            // Number Input from Buttons
-            numberButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    if (selectedCell) {
-                        const number = parseInt(button.querySelector('p').textContent);
-                        const cellIndex = Array.from(cells).indexOf(selectedCell);
-                        const row = Math.floor(cellIndex / 9);
-                        const col = cellIndex % 9;
-                        
-                        // Record previous state for undo
-                        recordHistory(selectedCell, gameBoard[row][col]);
-                        
-                        // Validate and enter the number
-                        if (validateCell(row, col, number)) {
-                            selectedCell.textContent = number;
-                            gameBoard[row][col] = number;
-                            selectedCell.classList.remove('invalid');
-                            highlightRelatedCells(selectedCell);
-                        } else {
-                            selectedCell.classList.add('invalid');
-                            selectedCell.style.animation = 'shake 0.5s';
-                            setTimeout(() => {
-                                selectedCell.style.animation = '';
-                            }, 500);
-                        }
-                    }
-                });
-            });
-    
-            // Erase Functionality
-            if (eraseBtn) {
-                eraseBtn.addEventListener('click', () => {
-                    if (selectedCell && selectedCell.textContent.trim() !== '') {
-                        const cellIndex = Array.from(cells).indexOf(selectedCell);
-                        const row = Math.floor(cellIndex / 9);
-                        const col = cellIndex % 9;
-                        
-                        // Record current state before erasing
-                        recordHistory(selectedCell, gameBoard[row][col]);
-                        
-                        // Clear cell
-                        selectedCell.textContent = '';
-                        gameBoard[row][col] = 0;
-                        selectedCell.classList.remove('invalid');
-                    }
-                });
+        
+                // Undo button
+                const undoBtn = document.querySelector('.option-img2');
+                if (undoBtn) {
+                    undoBtn.addEventListener('click', handleUndo);
+                }
             }
-    
-            // Undo Functionality
-            if (undoBtn) {
-                undoBtn.addEventListener('click', () => {
-                    if (gameHistory.length > 0) {
-                        const lastState = gameHistory.pop();
-                        if (lastState.element) {
-                            // Restore the previous state
-                            lastState.element.textContent = lastState.value !== 0 ? lastState.value : '';
-                            gameBoard[lastState.row][lastState.col] = lastState.value;
-                            
-                            // Remove invalid class if restoring a valid number
-                            lastState.element.classList.remove('invalid');
-                        }
+        
+            // Handle undo action
+            function handleUndo() {
+                if (gameHistory.length > 0) {
+                    const lastState = gameHistory.pop();
+                    if (lastState.element) {
+                        lastState.element.textContent = lastState.value !== 0 ? lastState.value : '';
+                        gameBoard[lastState.row][lastState.col] = lastState.value;
+                        lastState.element.classList.remove('invalid');
                     }
-                });
+                }
             }
-    
-            // Hamburger menu toggle
-            const hamburger = document.getElementById('ham');  
-            const sidebar = document.getElementById('sidebar');  
-    
-            hamburger.addEventListener('click', () => {  
-                sidebar.classList.toggle('active');
-            });  
-            
-            document.addEventListener('click', (event) => {  
-                const isClickInside = sidebar.contains(event.target) || hamburger.contains(event.target);  
-                if (!isClickInside) {  
-                    sidebar.classList.remove('active');
-                }  
-            });
+        
+            // Initialize the game
+            initializeGrid();
+            setupButtonListeners();
         });
         </script>
     </body>
