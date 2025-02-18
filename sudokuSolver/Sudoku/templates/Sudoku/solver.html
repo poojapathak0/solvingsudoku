@@ -417,6 +417,10 @@
                 // Get CSRF token
                 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 
+                // Show loading state
+                const dialogueDiv = document.querySelector('.dialouge .rectangle');
+                dialogueDiv.innerHTML = '<p>Solving...</p>';
+
                 // Send to backend
                 fetch('/solve-sudoku/', {
                     method: 'POST',
@@ -434,28 +438,51 @@
                 .then(data => {
                     if (data.solved) {
                         console.log("Sudoku solved successfully:", data.solution);
-                        updateGrid(data.solution);
+                        updateGrid(data.solution, data.heuristic_time, data.backtrack_time);
                     } else {
-                        alert(data.error || "Failed to solve the Sudoku.");
+                        dialogueDiv.innerHTML = `
+                            <p>Error: ${data.error}</p>
+                            <div class="smallrectangle">
+                                <p id="solve">Try Again</p>
+                            </div>
+                        `;
                     }
                 })
                 .catch(error => {
                     console.error("Error during solve request:", error);
-                    alert("An error occurred while solving the Sudoku.");
+                    dialogueDiv.innerHTML = `
+                        <p>Error: ${error.message}</p>
+                        <div class="smallrectangle">
+                            <p id="solve">Try Again</p>
+                        </div>
+                    `;
                 });
             }
         
-            // Update grid with solution
-            function updateGrid(solution) {
-                const cells = document.querySelectorAll('.sudoku-grid .cell');
-                for (let row = 0; row < 9; row++) {
-                    for (let col = 0; col < 9; col++) {
-                        const index = row * 9 + col;
-                        cells[index].textContent = solution[row][col] || '';
-                        cells[index].classList.add('solved');
-                    }
-                }
-            }
+    // Modify the updateGrid function to include timing display
+    function updateGrid(solution, heuristicTime, backtrackTime) {
+    const cells = document.querySelectorAll('.sudoku-grid .cell');
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            const index = row * 9 + col;
+            cells[index].textContent = solution[row][col] || '';
+            cells[index].classList.add('solved');
+        }
+    }
+
+      // Update the dialog div to show timing results
+      const dialogueDiv = document.querySelector('.dialouge .rectangle');
+      dialogueDiv.innerHTML = `
+          <div class="result-times">
+              <p>Solving times:</p>
+              <p>Heuristic: ${heuristicTime} ms</p>
+              <p>Backtracking: ${backtrackTime} ms</p>
+          </div>
+          <div class="smallrectangle">
+              <p id="solve">Solve Again</p>
+          </div>
+      `;
+  }
         
             // Clear solver grid
             function clearSolverGrid() {

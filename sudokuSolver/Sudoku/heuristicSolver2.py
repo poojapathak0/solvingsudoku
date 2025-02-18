@@ -1,3 +1,13 @@
+import time
+
+def solve_normal(board):
+    start_time = time.time()
+    # Rest of your existing solve_with_optimized_heuristic code stays the same
+    result = solve_with_optimized_heuristic(board)  # Rename your current function to this
+    end_time = time.time()
+    solve_time = (end_time - start_time) * 1000  # Convert to milliseconds
+    return result, solve_time
+
 def get_affected_cells(row, col):
     """Returns set of cells that would be affected by placing a number at (row, col)"""
     affected = set()

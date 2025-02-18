@@ -1,4 +1,12 @@
+import time 
 
+def solve_normal(board):
+    start_time = time.time()
+    # Rest of your existing solve_normal code stays the same
+    result = solve_backtracking(board)  # Rename your current function to this
+    end_time = time.time()
+    solve_time = (end_time - start_time) * 1000  # Convert to milliseconds
+    return result, solve_time
 def is_valid(board, row, col, num):
     # Check row
     if num in board[row]:
@@ -18,7 +26,7 @@ def is_valid(board, row, col, num):
     return True
 
 
-def solve_normal(board):
+def solve_backtracking(board):
     for row in range(9):
         for col in range(9):
             if board[row][col] == 0:

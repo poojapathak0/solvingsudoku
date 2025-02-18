@@ -5,7 +5,8 @@ from django.views.decorators.http import require_POST
 import json
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from .heuristicSolver2 import solve_with_optimized_heuristic
+from .heuristicSolver2 import solve_normal
+from .recursiveBacktracking import solve_normal
 from .puzzleGenerator2 import generate_sudoku
 from .models import UserInfo
 from django.contrib.auth.decorators import login_required
@@ -239,34 +240,44 @@ def save_game_state(request):
 def solve_sudoku(request):
     if request.method == 'POST':
         try:
-             board = [[0 for _ in range(9)] for _ in range(9)]
-             for row in range(9):
+            board = [[0 for _ in range(9)] for _ in range(9)]
+            for row in range(9):
                 for col in range(9):
                     cell_name = f'cell_{row}_{col}'
                     value = request.POST.get(cell_name, '').strip()
                     if value and value.isdigit() and 1 <= int(value) <= 9:
                         board[row][col] = int(value)
-             if solve_with_optimized_heuristic(board):
-                 return JsonResponse({
-                    'solved': True, 
-                    'solution': board
-                })
-             else:
+            
+            # Solve with both methods
+            board_heuristic = [row[:] for row in board]  # Create a copy for heuristic solver
+            board_backtrack = [row[:] for row in board]  # Create a copy for backtracking solver
+            
+            # Run both solvers
+            heuristic_success, heuristic_time = solve_normal(board_heuristic)
+            backtrack_success, backtrack_time = solve_normal(board_backtrack)
+            
+            if heuristic_success and backtrack_success:
                 return JsonResponse({
-                'solved': False, 
-                'error': 'No solution exists'
+                    'solved': True,
+                    'solution': board_heuristic,  # Use solution from either solver
+                    'heuristic_time': round(heuristic_time, 2),
+                    'backtrack_time': round(backtrack_time, 2)
+                })
+            else:
+                return JsonResponse({
+                    'solved': False,
+                    'error': 'No solution exists'
                 })
         except Exception as e:
             print(f"Exception in solve_sudoku: {e}")
-        return JsonResponse({
-            'solved': False, 
-            'error': str(e)
-        })
+            return JsonResponse({
+                'solved': False,
+                'error': str(e)
+            })
     return JsonResponse({
-        'solved': False, 
+        'solved': False,
         'error': 'Invalid request method'
     })
-
 # load game state
 # Add to views.py
 @login_required

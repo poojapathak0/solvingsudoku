@@ -15,6 +15,23 @@ body {
   position: relative;
 }
 
+/* css to timing results*/
+.result-times {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+.result-times p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.result-times p:first-child {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 
 /* Sidebar Styles - Keeping original design */
 .sidebar {
