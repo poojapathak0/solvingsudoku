@@ -15,23 +15,6 @@ body {
   position: relative;
 }
 
-/* css to timing results*/
-.result-times {
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #f5f5f5;
-  border-radius: 5px;
-}
-
-.result-times p {
-  margin: 5px 0;
-  font-size: 14px;
-}
-
-.result-times p:first-child {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
 
 /* Sidebar Styles - Keeping original design */
 .sidebar {
@@ -664,3 +647,69 @@ text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   }
 }
 
+/* Timing Results Container */
+.result-times {
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.2rem;
+}
+
+.result-header {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.timing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.timing-item {
+  background: #f8f9fa;
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.algorithm-name {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.time-value {
+  color: #F9AC30;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.time-unit {
+  color: #888;
+  font-size: 0.9rem;
+  margin-left: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .result-times {
+    padding: 1rem;
+  }
+  
+  .result-header {
+    font-size: 1.1rem;
+  }
+  
+  .timing-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  
+  .time-value {
+    font-size: 1.2rem;
+  }
+}
