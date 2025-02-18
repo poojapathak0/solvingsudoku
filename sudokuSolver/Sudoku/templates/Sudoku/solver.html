@@ -256,14 +256,7 @@
                 <img src="{% static 'Sudoku/images/clear.svg' %}" alt="undo">
                 <p id = "notes">Clear All</p>
             </div>
-            <div class="option-img2">
-                <img src="{% static 'Sudoku/images/undo.svg' %}" alt="undo">
-                <p id = "undo">Undo</p>
-            </div>
-            <div class="option-img3">
-                <img src="{% static 'Sudoku/images/erase.svg' %}" alt="undo">
-                <p id = "erase">Erase</p>
-            </div>
+
         </div>
     </div>
     <div class="dialouge">
@@ -281,7 +274,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             let selectedCell = null;
             let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
-            let gameHistory = [];
+            let moveHistory = [];//for undoFunctionality
         
             // Initialize the grid
             function initializeGrid() {
@@ -484,15 +477,29 @@
       `;
   }
         
-            // Clear solver grid
-            function clearSolverGrid() {
-                const cells = document.querySelectorAll('.sudoku-grid .cell');
-                cells.forEach(cell => {
-                    cell.textContent = '';
-                    cell.classList.remove('solved');
-                });
-                gameBoard = Array(9).fill().map(() => Array(9).fill(0));
-            }
+  function clearSolverGrid() {
+    // Clear all cells
+    const cells = document.querySelectorAll('.sudoku-grid .cell');
+    cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('solved');
+    });
+    gameBoard = Array(9).fill().map(() => Array(9).fill(0));
+    
+    // Reset the solve button text and container
+    const dialogueDiv = document.querySelector('.dialouge .rectangle');
+    dialogueDiv.innerHTML = `
+        <div class="smallrectangle">
+            <p id="solve">Solve</p>
+        </div>
+    `;
+    
+    // Reattach the event listener to the new solve button
+    const solveButton = document.getElementById('solve');
+    if (solveButton) {
+        solveButton.addEventListener('click', solveSudoku);
+    }
+}
         
             // Initialize everything
             initializeGrid();

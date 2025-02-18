@@ -33,7 +33,7 @@ def solve_backtracking(board):
                 for num in range(1, 10):
                     if is_valid(board, row, col, num):
                         board[row][col] = num
-                        if solve_normal(board):
+                        if solve_backtracking(board):
                             return True
                         board[row][col] = 0
                 return False

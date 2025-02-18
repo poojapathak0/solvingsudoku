@@ -5,8 +5,7 @@ from django.views.decorators.http import require_POST
 import json
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from .heuristicSolver2 import solve_normal
-from .recursiveBacktracking import solve_normal
+from .sudoku_solver import solve_with_comparison
 from .puzzleGenerator2 import generate_sudoku
 from .models import UserInfo
 from django.contrib.auth.decorators import login_required
@@ -248,18 +247,13 @@ def solve_sudoku(request):
                     if value and value.isdigit() and 1 <= int(value) <= 9:
                         board[row][col] = int(value)
             
-            # Solve with both methods
-            board_heuristic = [row[:] for row in board]  # Create a copy for heuristic solver
-            board_backtrack = [row[:] for row in board]  # Create a copy for backtracking solver
+            # Solve using both methods and compare
+            success, solution, heuristic_time, backtrack_time = solve_with_comparison(board)
             
-            # Run both solvers
-            heuristic_success, heuristic_time = solve_normal(board_heuristic)
-            backtrack_success, backtrack_time = solve_normal(board_backtrack)
-            
-            if heuristic_success and backtrack_success:
+            if success:
                 return JsonResponse({
                     'solved': True,
-                    'solution': board_heuristic,  # Use solution from either solver
+                    'solution': solution,
                     'heuristic_time': round(heuristic_time, 2),
                     'backtrack_time': round(backtrack_time, 2)
                 })
