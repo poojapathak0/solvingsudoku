@@ -274,11 +274,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             let selectedCell = null;
             let gameBoard = Array(9).fill().map(() => Array(9).fill(0));
-            let moveHistory = [];//for undoFunctionality
+            let moveHistory = [];//for undoFunctionality\
+            setupButtonListeners();
         
             // Initialize the grid
             function initializeGrid() {
                 const cells = document.querySelectorAll('.cell');
+                
                 cells.forEach((cell, index) => {
                     cell.setAttribute('tabindex', '0');
                     cell.addEventListener('click', () => selectCell(cell));
@@ -286,6 +288,8 @@
                     cell.addEventListener('focus', () => selectCell(cell));
                 });
             }
+
+            
         
             // Handle cell selection
             function selectCell(cell) {
@@ -340,6 +344,32 @@
                 gameBoard[row][col] = 0;
                 cell.classList.remove('invalid');
             }
+
+                        // Handle arrow key navigation-------------not working as of now
+            function handleArrowNavigation(key, currentIndex) {
+                const cells = document.querySelectorAll('.cell');
+                let nextIndex;
+                
+                switch(key) {
+                    case 'ArrowUp':
+                        nextIndex = currentIndex - 9;
+                        break;
+                    case 'ArrowDown':
+                        nextIndex = currentIndex + 9;
+                        break;
+                    case 'ArrowLeft':
+                        nextIndex = currentIndex - 1;
+                        break;
+                    case 'ArrowRight':
+                        nextIndex = currentIndex + 1;
+                        break;
+                }
+        
+                if (nextIndex >= 0 && nextIndex < cells.length) {
+                    cells[nextIndex].focus();
+                }
+            }
+        
         
             // Highlight related cells
             function highlightRelatedCells(cell) {
@@ -500,7 +530,24 @@
         solveButton.addEventListener('click', solveSudoku);
     }
 }
-        
+
+    // Setup event listeners for buttons
+    function setupButtonListeners() {
+        // Number buttons
+        const numberButtons = document.querySelectorAll('.rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5, .rectangle6, .rectangle7, .rectangle8, .rectangle9');
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (selectedCell) {
+                    const number = parseInt(button.querySelector('p').textContent);
+                    const cellIndex = Array.from(document.querySelectorAll('.cell')).indexOf(selectedCell);
+                    handleNumberInput(selectedCell, number, cellIndex);
+                }
+            });
+    });
+}
+
+                
+
             // Initialize everything
             initializeGrid();
         
