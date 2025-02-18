@@ -853,40 +853,40 @@ document.head.appendChild(styleSheet);
 
 // Modify your level selection code in level.html
 document.addEventListener("DOMContentLoaded", function () {
-    // Only add this code if we're on the level selection page
-    if (document.querySelector('.rectangle1')) {
+   // Only add this code if we're on the level selection page
+   if (document.querySelector('.rectangle1')) {
         const difficulties = {
-            beginner: 50,
-            easy: 40,
-            medium: 35,
-            hard: 27,
-            extreme: 20
+            'beginner': 50,
+            'easy': 40,
+            'medium': 35,
+            'hard': 27,
+            'extreme': 20
         };
 
         document.querySelectorAll(".rectangle1, .rectangle2, .rectangle3, .rectangle4, .rectangle5").forEach(element => {
             element.addEventListener("click", function () {
-                const difficultyText = element.querySelector('p').id;
-                const difficulty = difficultyText.split("-")[0];
-
+                // Get the difficulty text from the clicked element's paragraph
+                const difficultyText = this.querySelector('p').textContent.toLowerCase();
+                
                 // Store the selected difficulty level
-                sessionStorage.setItem('currentLevel', difficulty);
+                sessionStorage.setItem('currentLevel', difficultyText);
 
                 // Clear any existing timer state for this level
-                document.cookie = `sudokuTimer_${difficulty}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                document.cookie = `sudokuTimer_${difficultyText}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 
-                // Your existing difficulty selection code
-                selectDifficulty(difficulty);
+                // Get the clues for the selected difficulty
+                const clues = difficulties[difficultyText];
+                console.log(`Generating puzzle with ${clues} clues for ${difficultyText} difficulty`);
 
-                const clues = difficulties[difficulty];
-                console.log(`Generating puzzle with ${clues} clues for ${difficulty} difficulty`);
-                
+                // Fetch the new puzzle
                 fetch('/sudoku/generate/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
+                        difficulty: difficultyText,
                         clues: clues
                     })
                 })
@@ -896,9 +896,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         throw new Error(data.error);
                     }
                     
+                    // Store the generated puzzle and solution in session storage
                     sessionStorage.setItem('sudokuPuzzle', JSON.stringify(data.puzzle));
                     sessionStorage.setItem('solutionBoard', JSON.stringify(data.solutionBoard));
+                    sessionStorage.setItem('selectedDifficulty', difficultyText);
                     
+                    // Redirect to the play page
                     window.location.href = '/play/';
                 })
                 .catch(error => {
@@ -910,6 +913,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+if (window.location.pathname.includes('/play')) {
+        const difficultyElement = document.querySelector('.difficulty-level');
+        if (difficultyElement) {
+            const savedDifficulty = sessionStorage.getItem('selectedDifficulty');
+            if (savedDifficulty) {
+                difficultyElement.textContent = savedDifficulty.charAt(0).toUpperCase() + savedDifficulty.slice(1);
+                difficultyElement.className = `difficulty-level ${savedDifficulty}`;
+            }
+        }
+    }
 // Initialize timer only on the play page
 if (window.location.pathname.includes('/play')) {
     document.addEventListener('DOMContentLoaded', () => {
