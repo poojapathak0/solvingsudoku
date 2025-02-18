@@ -280,6 +280,18 @@
             // Initialize the grid
             function initializeGrid() {
                 const cells = document.querySelectorAll('.cell');
+                   // Listen for arrow key navigation
+
+            
+    // Listen for arrow key navigation
+            document.addEventListener('keydown', (event) => {
+                if (selectedCell) {
+                    const cells = document.querySelectorAll('.cell');
+                    const currentIndex = Array.from(cells).indexOf(selectedCell);
+                    handleArrowNavigation(event.key, currentIndex);
+                }
+            });
+  
                 
                 cells.forEach((cell, index) => {
                     cell.setAttribute('tabindex', '0');
