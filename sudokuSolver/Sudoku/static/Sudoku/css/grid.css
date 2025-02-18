@@ -22,12 +22,13 @@ body {
   height: 100%;
   gap: 1px;
 }
-.pencil-mark {
-  font-size: xx-small; /* or 10px */
-  font-style: italic;
-  color: grey;
-  
-}
+ .pencil-mark {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        font-size: 0.6em;
+        color: grey;
+        text-align: center;
+    }
 
 .pencil-cell {
   display: flex;
