@@ -985,7 +985,7 @@ function enterNumber(num) {
     const index = [...cells].indexOf(selectedCell);
     const row = Math.floor(index / 9);
     const col = index % 9;
-     const currentNum = parseInt(selectedCell.textContent);
+    const currentNum = parseInt(selectedCell.textContent);
 
     if (isPencilMode) {
         handlePencilMode(num);
@@ -1092,9 +1092,12 @@ function updateScoreDisplay() {
 }
 
 function handleIncorrectEntry(row, col, num, cells) {
-    mistakeCount++;
-    updateMistakeDisplay();
-    
+    // Check if the cell already has a wrong entry class to avoid double counting
+    if (!selectedCell.classList.contains('wrong-entry')) {
+        mistakeCount++;
+        updateMistakeDisplay();
+    }
+
     if (mistakeCount >= MAX_MISTAKES) {
         showGameOver();
         return;
