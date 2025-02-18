@@ -592,6 +592,108 @@
                 }
             });
         });
+        
+        // JavaScript for toggling the sidebar  
+        const hamburger = document.getElementById('ham');  
+        const sidebar = document.getElementById('sidebar');  
+    
+        hamburger.addEventListener('click', () => {  
+            sidebar.classList.toggle('active'); // Toggle the active class  
+        });  
+        
+        document.addEventListener('click', (event) => {  
+                const isClickInside = sidebar.contains(event.target) || hamburger.contains(event.target);  
+                if (!isClickInside) {  
+                    sidebar.classList.remove('active'); // Hide the sidebar  
+                }  
+            });
+
+              
+        const userProfile = document.getElementById('userProfile');
+    if (userProfile) {
+        userProfile.classList.add('authenticated');
+        
+        userProfile.addEventListener('click', (event) => {
+            event.stopPropagation();
+            userProfile.classList.toggle('expanded');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!userProfile.contains(event.target)) {
+                userProfile.classList.remove('expanded');
+            }
+        });
+    }
+
+    // Change username function
+    function changeUsername() {
+    const newUsername = prompt('Enter new username:');
+    if (newUsername && newUsername.trim() !== '') {
+        fetch('/change-username/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({username: newUsername.trim()})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelector('.username').textContent = newUsername.trim();
+            }
+        });
+    }
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    // Delete profile function
+    function deleteProfile() {
+    if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('/delete-profile/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to home page after successful deletion
+                window.location.href = '/';
+            } else {
+                alert('Failed to delete profile. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the profile.');
+        });
+    }
+}
+
+function logoutUser() {
+    window.location.href = "{% url 'logout' %}";
+}
         </script>
     </body>
     </html>
