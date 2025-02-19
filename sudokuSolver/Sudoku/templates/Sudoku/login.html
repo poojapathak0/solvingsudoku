@@ -1,406 +1,155 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Caveat Brush", serif;
-}
+<!DOCTYPE html>
+<html lang="en">
 
-body {
-  min-height: 100vh;
-  display: flex;
-  background-color: #f5f5f5;
-  overflow-x: hidden;
-}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Sudoku/css/login.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Karla:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+</head>
 
-/* Sidebar Styles */
-.sidebar {
-  position: fixed;
-  left: -250px;
-  top: 0;
-  width: min(250px, 80vw);
-  height: 100vh;
-  background-color: #1a1a1a;
-  transition: left 0.3s ease-in-out;
-  z-index: 1000;
-  overflow: hidden;
-}
+<body>
+    {% csrf_token %}
+    <div class="ham">
+        <button id = "ham" class="ham"><img id="ham" src="{% static 'Sudoku/images/ham1.png' %}" alt="" srcset=""></button>
+    </div>
+    <div class ="sidebar" id = "sidebar">
+    <nav>
+        <div class="top">
 
-.sidebar.active {
-  left: 0;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-}
-/* Navigation Elements */
-nav {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(0.5rem, 2vw, 1rem) 0;
-}
-
-.top, .buttom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(1rem, 2vw, 1.5rem);
-}
-
-
-/* Hamburger Button */
-.ham {
-  position: fixed;
-  left: clamp(10px, 4vw, 40px);
-  top: clamp(10px, 3vw, 20px);
-  z-index: 1001;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: clamp(8px, 1.5vw, 10px);
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.ham img {
-  width: clamp(20px, 4vw, 25px);
-  height: clamp(15px, 3vw, 20px);
-}
-
-.ham:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  /* transform: scale(1.1); */
-}
+            <div class="menu">
+                <div class="hamburger">
+                    <img id="hamburger" src="{% static 'Sudoku/images/menu.svg' %}" alt="" srcset="">
+                </div>
+                <div class="homeicon">
+                    <a href="{%url 'home'%}">
+                    <img id="homeicon" src="{% static 'Sudoku/images/home.svg' %}" alt="" srcset="">
+                    </a>
+                </div>
+            </div>
+            <div class="Play" id="playbutton" onclick="navigateToLogin()">  
+                <img src="{% static 'Sudoku/images/joy.svg' %}" alt="" srcset="">  
+                <p>Play</p>  
+            </div>  
+            
+            <div class="Play" id="solverbutton" onclick="navigateToSolver()">  
+                <img src="{% static 'Sudoku/images/cube.svg' %}" alt="" srcset="">  
+                <p>Solver</p>  
+            </div>  
+            
+            <script>  
+                function navigateToLogin() {  
+                    window.location.href = "{% url 'login' %}";  
+                }  
+            
+                function navigateToSolver() {  
+                    window.location.href = "{% url 'solver' %}";  
+                }  
+            </script>
+           
+            
+            </div>
+            <div class="buttom">
+                <div class="help">
+                    <img src="{% static 'Sudoku/images/questionmark.svg' %}" alt="">
+                    <p>Help</p>
+                </div>
+            </div>
+    </nav>
+</div>
 
 
-.menu {
-  width: 180px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-}
-
-.menu img {
-  height: clamp(30px, 3vw, 40px);
-  width: clamp(39px, 3vw, 40px);
-  padding: 8px;
-  transition: all 0.3s ease;
-}
-
-.hamburger:hover{
-  border-radius: 5px;
-  transform: scale(1.1);
-  background-color: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-}
-
-.homeicon:hover{
-  border-radius: 5px;
-  transform: scale(1.1);
-  background-color: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-}
-.Play, .Solver, .help {
-  color: #f0f0f0;
-  width: 90%;
-  padding: 0.8rem;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: clamp(1.2rem, 2vw, 1.7rem);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.Play img, .Solver img {
-  height: clamp(35px, 4vw, 50px);
-  width: clamp(35px, 4vw, 50px);
-}
-
-.help img {
-  height: clamp(25px, 3vw, 35px);
-  width: clamp(25px, 3vw, 35px);
-}
-
-.Play:hover, .Solver:hover, .help:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(2px);
-}
-
-/* Main Content Area */
-.main-content {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: clamp(1rem, 3vw, 2rem);
-  width: 100%;
-  min-height: 100vh;
-}
-
-/* Login Container */
-.login-container {
-  background: white;
-  padding: clamp(1.5rem, 4vw, 2rem);
-  border-radius: 0px 80px 0px 80px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: min(90vw, 580px);
-  max-height: min(90vh, 500px);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(1rem, 2vw, 2rem);
-}
-/* Profile Image */
-.profile {
-    width: clamp(80px, 20vw, 200px);
-    height: clamp(80px, 20vw, 200px);
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid black;
-}
-
-.profile img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Login Form Elements */
-.login-text {
-  text-align: center;
-  font-size: clamp(1.2rem, 3vw, 2rem);
-  color: #333;
-}
-
-.form-group {
-  position: relative;
-  width: 100%;
-  margin-bottom: clamp(0.5rem, 2vw, 1rem);
-}
-
-
-.login-input {
-  width: 100%;
-  padding: clamp(0.5rem, 1.5vw, 1rem);
-  font-size: clamp(0.9rem, 1.8vw, 1.5rem);
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.form-group label {
-  position: absolute;
-  font-size: clamp(0.9rem, 1.8vw, 1.5rem);
-  color: rgb(118, 119, 119);
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: all 0.2s ease;
-  pointer-events: none;
-  background: white;
-  padding: 0 5px;
-}
-
-/* Ensure proper form field behavior */
-.login-input:focus,
-.login-input:not(:placeholder-shown) {
-    outline: none;
-    border-color: #403f3f;
-}
-
-.login-input:focus + label,
-.login-input:not(:placeholder-shown) + label {
-    top: 0;
-    transform: translateY(-50%) scale(0.8);
-    background: white;
-    color: #000000;
-}
-
-.login-input::placeholder {
-    color: transparent;
-}
-
-
-/* Submit Button */
-.Submit {
-  padding: clamp(0.4rem, 1vw, 0.8rem) clamp(0.8rem, 2vw, 1.5rem);
-  font-size: clamp(0.9rem, 1.5vw, 1.5rem);
-  border-radius: 10px;
-  border: none;
-  background-color: #F9AC30;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  align-self: flex-end;
-  margin-top: auto;
-}
-
-/* Animation for submit button */
-.Submit:hover {
-  transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-
-/* Messages styling */
-.messages {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  list-style: none;
-  text-align: center;
-  font-size: clamp(0.8rem, 1.5vw, 1rem);
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .main-content {
-      margin-left: 0;
-      padding: 1rem;
-  }
-
-
-  .menu-toggle {
-      display: block;
-  }
-
-  .nav-visible {
-      transform: translateX(0);
-  }
-
-  }
   
-
-
-@media (max-width: 768px) {
-  nav {
-      min-width: 60px;
-  }
-  
-  .Play p, .Solver p, .help p {
-      display: none;
-  }
-  
-  .Play, .Solver, .help {
-      justify-content: center;
-  }
-  
-  .screen {
-      margin-left: 60px;
-  }
-}
-
-@media (max-width: 576px) {
-  .login-container {
-      padding: 1.5rem;
-  }
-
-  .profile {
-      width: 100px;
-      height: 100px;
-  }
-
-  .login-text {
-      font-size: 1.2rem;
-  }
-
-  .login-input {
-      font-size: 1rem;
-      padding: 0.6rem;
-  }
-}
-@media(max-width: 430px){
-  .Submit{
-    width: 40px;
-    height: 20px;
-    font-size: 0.5em;
-   
-  }
-  .login-container{
-    width: 280px;
-    height: 300px;
-    top: -170px;
+<main class="main-content">
+    <div class="login-container">
+        {% if messages %}  
+<ul class="messages">  
+    {% for message in messages %}  
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>  
+    {% endfor %}  
+</ul>  
+{% endif %} 
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+        <div class="profile">
+            <img src="{% static 'Sudoku/images/profile.jpg' %}" alt="Profile">
+        </div>
+        <div class="login-text">Enter the username:</div>
+        <div class = "form-group">
+            <input type="text" class="login-input" placeholder="Username" minlength="3" maxlength="30" name = "username" id = "username">
+            <label for = "username">Username</label>
+        </div>
+        <button id="Submit" class="Submit">Submit</button>
+        </form>
+    </div>
     
-  }
-  .profile{
-    width:80px;
-    height:80px;
-  }
-  .login-text{
-    font-size: 1em;
-  }
-  .login-input{
-    font-size: 0.8em;
-    padding: 0.4em;
-  }
-  
-  
+</main>
+
+    <script>
+        function navigateToPlay() {
+    fetch('/check-game-state/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.game_in_progress) {
+            window.location.href = "/play/";
+        } else {
+            window.location.href = "/level/";
+        }
+    })
+    .catch(error => {
+        console.error('Error checking game state:', error);
+        // Default to level page if there's an error
+        window.location.href = "/level/";
+    });
 }
 
-@media (max-width: 320px) {
-  .login-container {
-      padding: 1rem;
-      width: 240px;
-      height:280px;
-  }
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+        // JavaScript for toggling the sidebar  
+        const hamburger = document.getElementById('ham');  
+        const sidebar = document.getElementById('sidebar');  
+    
+        hamburger.addEventListener('click', () => {  
+            sidebar.classList.toggle('active'); // Toggle the active class  
+        });  
+        
+        document.addEventListener('click', (event) => {  
+                const isClickInside = sidebar.contains(event.target) || hamburger.contains(event.target);  
+                if (!isClickInside) {  
+                    sidebar.classList.remove('active'); // Hide the sidebar  
+                }  
+            });
 
-  .profile {
-      width: 70px;
-      height: 70px;
+
+                document.getElementById('solverbutton').addEventListener('click', function() {
+                    window.location.href = '/solver/';
+                });
+    </script>  
      
-  }
-  .Submit{
-    width: 48px;
-    height: 28px;
-    margin-left: 155px;
-    font-size: 0.6em;
-  }
-}
+</body>
 
-
-/* Media Queries */
-@media (max-width: 768px) {
-  .login-container {
-      margin-top: clamp(2rem, 5vw, 4rem);
-      padding: clamp(1rem, 3vw, 1.5rem);
-  }
-  
-  nav {
-      padding: 0.5rem;
-  }
-  
-  .Play p, .Solver p, .help p {
-      display: none;
-  }
-  
-  .Play, .Solver, .help {
-      justify-content: center;
-      width: 80%;
-  }
-}
-
-@media (max-width: 480px) {
-  .login-container {
-      border-radius: 0px 40px 0px 40px;
-      padding: 1rem;
-  }
-  
-  .Submit {
-      padding: 0.4rem 0.8rem;
-      font-size: 1rem;
-  }
-}
-
-@media (max-height: 600px) {
-  .login-container {
-      margin: 4rem 0;
-      gap: 0.8rem;
-  }
-  
-  .profile {
-      width: 80px;
-      height: 80px;
-  }
-}
-
+</html>
