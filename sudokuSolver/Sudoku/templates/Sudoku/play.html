@@ -900,19 +900,25 @@ document.addEventListener("DOMContentLoaded", function () {
             element.addEventListener("click", function () {
                 const difficultyText = element.querySelector('p').id;
                 const difficulty = difficultyText.split("-")[0];
-
+        
                 // Store the selected difficulty level
                 sessionStorage.setItem('currentLevel', difficulty);
-
+        
+                // Update the displayed difficulty level in the UI
+                const difficultyLevelDisplay = document.querySelector('.difficulty-level'); // Select the span displaying the difficulty
+                if (difficultyLevelDisplay) {
+                    difficultyLevelDisplay.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1); // Capitalize the first letter
+                }
+        
                 // Clear any existing timer state for this level
                 document.cookie = `sudokuTimer_${difficulty}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-
+        
                 // Your existing difficulty selection code
                 selectDifficulty(difficulty);
-
+        
                 const clues = difficulties[difficulty];
                 console.log(`Generating puzzle with ${clues} clues for ${difficulty} difficulty`);
-                
+        
                 fetch('/sudoku/generate/', {
                     method: 'POST',
                     headers: {
@@ -1575,6 +1581,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const notesButton = document.querySelector('.option-img1');
     if (notesButton) {
         notesButton.addEventListener('click', togglePencilMode);
+    }
+});
+document.addEventListener('DOMContentLoaded', () => {
+    // Read the selected difficulty from sessionStorage
+    const selectedDifficulty = sessionStorage.getItem('currentLevel');
+    
+    // Update the difficulty display
+    const difficultyDisplay = document.querySelector('.difficulty-level');
+    if (selectedDifficulty && difficultyDisplay) {
+        difficultyDisplay.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
     }
 });
     </script>
