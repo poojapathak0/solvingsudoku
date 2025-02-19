@@ -92,64 +92,56 @@ nav {
   } */
 /* Main Screen Styles */
 .screen {
-    height: 71vh;
-    display: grid;
-    place-items: center;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    overflow: hidden;
-    margin-top: 5%;
-    width: 97%;
-    padding: 0 20px; /* Add horizontal padding */
+    padding: 1rem;
+    overflow-x: hidden;
 }
-
-/* Decorative Elements */
-.cube, .puzzle, .joystick {
+/* Decorative elements with responsive positioning */
+.cube, .joystick {
     position: absolute;
     transition: all 0.3s ease;
 }
 
 .cube {
     top: 10%;
-    left: 20%;
-    width: clamp(50px, 15vw, 200px);
-}
-
-.puzzle {
-    top: 40%;
-    left: 30%;
-    width: clamp(40px, 12vw, 150px);
+    left: clamp(5%, 15%, 20%);
+    width: clamp(40px, 12vw, 180px);
 }
 
 .joystick {
-    top: 15%;
-    right: 25%;
-    width: clamp(45px, 13vw, 180px);
+    top: 10%;
+    right: clamp(5%, 15%, 20%);
+    width: clamp(40px, 12vw, 180px);
 }
-.ps{
-   
-    gap:10px;
+
+/* Button container */
+.ps {
     display: flex;
-    align-items: center;
     flex-direction: column;
-    text-align: center;
-    margin-top:-5%;
-
-
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+    margin-top: clamp(1rem, 3vw, 3rem);
+    width: 100%;
+    max-width: 400px;
+    padding: 0 1rem;
 }
 
-.p{
+/* Button styles */
+.p, .s {
     color: #ffffff;
     background-color: #000000;
-    width: 140%;
-    padding: 0.8rem;
+    width: 100%;
+    padding: clamp(0.6rem, 1.5vw, 1rem);
     border-radius: 40px;
-    display: flex;
-    align-items: center;
-    font-size: clamp(1.2rem, 2vw, 1.7rem);
+    font-size: clamp(1rem, 1.8vw, 1.7rem);
+    text-align: center;
     transition: all 0.3s ease;
     cursor: pointer;
-    place-content: center;
-
 }
 
 .p:hover{
@@ -229,30 +221,71 @@ nav {
 /* Text Styles */
 .screentext {
     text-align: center;
-    padding: 0rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
     z-index: 1;
-    left: 0px;
 }
 
 .maintext {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem; 
+    gap: clamp(0.5rem, 1vw, 1rem);
+    margin-bottom: clamp(1rem, 2vw, 2rem);
+}
+
+/* Help and About buttons */
+.info-section {
+    position: fixed;
+    left: clamp(10px, 2vw, 20px);
+    bottom: clamp(10px, 2vw, 20px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 1vw, 1rem);
+    z-index: 1000;
+}
+
+.help, .about {
+    width: clamp(40px, 8vw, 60px);
+    height: clamp(40px, 8vw, 60px);
+    border-radius: 50%;
+    font-size: clamp(0.8rem, 1.2vw, 1rem);
+}
+/* User profile responsive styling */
+.user-profile {
+    position: fixed;
+    top: clamp(10px, 2vw, 20px);
+    right: clamp(10px, 2vw, 40px);
+    padding: clamp(0.3rem, 1vw, 1rem);
+    max-width: min(90vw, 300px);
+}
+
+.profile-icon {
+    width: clamp(30px, 5vw, 35px);
+    height: clamp(30px, 5vw, 35px);
+}
+
+/* Modal responsiveness */
+.modal-content {
+    width: min(90vw, 500px);
+    max-height: 90vh;
+    margin: 1rem;
 }
 
 .part1 {
-    font-size: clamp(2rem, 5vw, 4rem); /* Adjusted for better scaling */
+    font-size: clamp(2rem, 5vw, 4rem);
+    animation: float 3s ease-in-out infinite;
 }
 
 .part2 {
-    font-size: clamp(3rem, 7vw, 6rem); /* Adjusted for better scaling */
+    font-size: clamp(3rem, 7vw, 6rem);
+    animation: float 3s ease-in-out infinite 0.2s;
 }
 
 .subtext {
     color: grey;
-    font-size: clamp(0.8rem, 1.2vw, 1.2rem);
-    margin-top: 1rem;
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+    margin-top: clamp(0.5rem, 1vw, 1rem);
 }
 
 .user-profile {
@@ -634,4 +667,54 @@ nav {
         width: clamp(150px, 70vw, 200px);
         font-size: clamp(1rem, 1.5vw, 1.5rem);
     }
+}
+/* Media Queries for specific scenarios */
+@media (max-width: 480px) {
+    .screen {
+        padding-top: 4rem;
+    }
+    
+    .cube, .joystick {
+        width: clamp(30px, 15vw, 60px);
+    }
+    
+    .ps {
+        margin-top: 2rem;
+    }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    .screen {
+        padding: 4rem 1rem;
+    }
+    
+    .ps {
+        margin-top: 1rem;
+    }
+    
+    .maintext {
+        gap: 0.25rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .cube {
+        left: 20%;
+        width: 180px;
+    }
+    
+    .joystick {
+        right: 20%;
+        width: 180px;
+    }
+    
+    .ps {
+        margin-top: 4rem;
+    }
+}
+
+/* Animation keyframes */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
 }
